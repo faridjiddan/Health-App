@@ -1,0 +1,1142 @@
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/sharedlayout1}">
+
+<head>
+    <title>Profil</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+</head>
+
+<body>
+
+
+
+<div layout:fragment="content">
+
+    <!-- <div class="modal fade" id="modalotp" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Verifikasi E-mail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding-left: 50px; padding-right: 50px;">
+                    <p>Masukan kode OTP yang telah dikirimkan ke email anda</p>
+                    <div class="mb-3">
+                        <input type="hidden" id="hidden_otp">
+                        <input type="text" class="form-control" id="otp">
+                        <div id="otpHelp" class="form-text" style="color: red;"></div>
+                        <div id="countdown"></div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary" onclick="checkOtp()">Konfirmasi OTP</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <div style="width: max-content;">
+        <div class="card-header" style="width: fit-content;">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="true" href="#" style="border-top: 2px solid #448dee; border-left: 2px solid #448dee; border-right: 2px solid #448dee; border-top-left-radius: 5px; border-top-right-radius: 5px;">Profil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Alamat</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pembayaran</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body" style="height: fit-content; border:2px solid #448dee; margin-bottom: 100px; border-radius: 5px;">
+
+            <table>
+                <thead>
+                    <th></th>
+                </thead>
+                <tbody id="dataPribadi">
+                    <td>
+                    </td>
+                </tbody>
+            </table>            
+
+            <table style="margin-bottom: 50px;">
+                <thead>
+                    <th></th>
+                </thead>
+                <tbody id="dataAkun">
+                    <td>
+                    
+                    </td>
+                </tbody>
+            </table>
+
+
+
+
+
+
+        </div>
+
+    </div>
+
+    <script>
+
+        loadDataPribadi()
+        loadDataAkun()
+        function loadDataAkun () {
+            $.ajax({
+                url:'http://localhost:8083/api/user/' + getCustLastLogin(),
+                type:'GET',
+                contentType: 'application/json',
+                success:function(user) {
+                    console.log(user)
+                    var str = ''
+                    for(i=0; i< user.length; i++) {
+                        str += '<div class="container" style="margin-bottom: 30px; padding-right:0; width:109%;">';
+                        str += '<div class="row">';
+                        str += '<div class="col-2"></div>';
+                        str += '<div class="col-8" style="max-width: 700px;">';
+                        str += '<div class="container">';
+                        str += '<div class="row">';
+                        str += '<div class="row" style="padding-top: 30px;">';
+                        str += '<div class="col-10">';
+                        str += '<h style="font-size: 13pt; color: #668cff; font-weight: bold">Data Akun</h>';
+                        str += '</div>';
+                        str += '<div class="col-2">';
+                        str += '<button onclick="editFormAkun()"style="width: fit-content; padding: 0; border: none; background: none; float: right;"><i class="fa fa-pencil" ></i></button>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px;">';
+                        str += '<div class="row">';
+                        str += '<h style="font-size: 11pt; color: #668cff; font-weight: lighter">Email</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px; padding-bottom: 0; margin-left: 1px;">';
+                        str += '<h style="font-size: 11pt; color: #808080; font-weight: lighter">'+user[i].email+'</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 8px; margin-left: 1px;">';
+                        str += '<hr style="color: #080aff; font-weight: bold; padding-left: 10px;" />';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="row">';
+                        str += '<div class="row">';
+                        str += '<h style="font-size: 11pt; color: #668cff; font-weight: lighter">Password</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px; padding-bottom: 0; margin-left: 1px;">';
+                        str += '<h style="font-size: 11pt; color: #808080; font-weight: lighter">********</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 8px; margin-left: 1px;">';
+                        str += '<hr style="color: #080aff; font-weight: bold; padding-left: 10px;" />';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="col-2"></div>';
+                        str += '</div>';
+                        str += '</div>';
+
+                    }
+                    $('#dataAkun').html(str);
+                }
+            })
+        }
+
+        function loadDataPribadi () {
+            $.ajax({
+                url:'http://localhost:8083/api/user/' + getCustLastLogin(),
+                type:'GET',
+                contentType: 'application/json',
+                success:function(user) {
+                    console.log(user)
+                    var str = '';
+                    for(i=0; i< user.length; i++) {
+                        str += '<div class="container">';
+                        str += '<div class="row">';
+                        str += '<div class="col-2"></div>';
+                        str += '<div class="col-8" style="max-width: 700px;">';
+                        str += '<div class="container">';
+                        str += '<div class="row">';
+                        str += '<div class="row" style="padding-top: 30px;">';
+                        str += '<div class="col-10">';
+                        str += '<h style="font-size: 13pt; color: #668cff; font-weight: bold">Data Pribadi</h>';
+                        str += '</div>';
+                        str += '<div class="col-2">';
+                        str += '<button onclick="editFormData()"style="width: fit-content; padding: 0; border: none; background: none; float: right;"><i class="fa fa-pencil" ></i></button>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px;">';
+                        str += '<div class="row">';
+                        str += '<h style="font-size: 11pt; color: #668cff; font-weight: lighter">Nama Lengkap</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px; padding-bottom: 0; margin-left: 1px;">';
+                        str += '<h style="font-size: 11pt; color: #808080; font-weight: lighter">'+user[i].fullname+'</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 8px; margin-left: 1px;">';
+                        str += '<hr style="color: #080aff; font-weight: bold; padding-left: 10px;" />';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="row">';
+                        str += '<div class="row">';
+                        str += '<h style="font-size: 11pt; color: #668cff; font-weight: lighter">Nomor Handphone</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px; padding-bottom: 0; margin-left: 1px;">';
+                        str += '<h style="font-size: 11pt; color: #808080; font-weight: lighter">'+'+62'+user[i].mobile_phone+'</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 8px; margin-left: 1px;">';
+                        str += '<hr style="color: #080aff; font-weight: bold; padding-left: 10px;" />';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="row">';
+                        str += '<div class="row">';
+                        str += '<h style="font-size: 11pt; color: #668cff; font-weight: lighter">Tanggal lahir</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 10px; padding-bottom: 0; margin-left: 1px;">';
+                        str += '<h style="font-size: 11pt; color: #808080; font-weight: lighter">'+user[i].dob+'</h>';
+                        str += '</div>';
+                        str += '<div class="row" style="padding-top: 8px; margin-left: 1px;">';
+                        str += '<hr style="color: #080aff; font-weight: bold; padding-left: 10px;" />';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '<div class="col-2"></div>';
+                        str += '</div>';
+                        str += '</div>';
+
+                    }
+                    $('#dataPribadi').html(str);
+                }
+            })
+        }
+
+        function editFormData() {
+            $.ajax({
+                url:'http://localhost:8083/api/user/' +getCustLastLogin(),
+                type:'GET',
+                contentType: 'application/json',
+                success:function(user) {
+                    str = `
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Nama Lengkap*</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" id = "fullname" maxlength="255" value="${user[0].fullname}" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:5px;"> <br>
+                                <input type="hidden" id = "customer_id" value="${user[0].customer_id}">
+                                <input type="hidden" id = "biodata_id" value="${user[0].biodata_id}">
+                                <input type="hidden" id = "weight" value="${user[0].weight}">
+                                <input type="hidden" id = "height" value="${user[0].height}">
+                                <input type="hidden" id = "rhesus_type" value="${user[0].rhesus_type}">
+                                <input type="hidden" id = "gender" value="${user[0].gender}">
+                                <span style="color: red; font-size: 10pt;" id="validationName"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Tanggal Lahir*</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <span class="glyphicon glyphicon-th"></span>
+                                    </div>
+                                    <input id="dob" type="date" class="datepicker" value="${user[0].dob}" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:5px;"> <br>
+                                    <span style="color: red; font-size: 10pt;" id="validationDob"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Nomor Handphone*</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="input-group mb-3" style="border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; border-radius:5px;">
+                                    <span class="input-group-text" id="basic-addon1">+62</span>
+                                    <input type="text" class="form-control" value="${user[0].mobile_phone}" id = "mobile_phone" maxlength="13">
+                                    <span style="color: red; font-size: 10pt;" id="validationMopho"></span>
+                                </div> 
+                            </td> 
+                        </tr>
+                    </table> 
+                    `;
+                    btn = `
+                    <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                    <button type="button" class="btn btn-primary" value="${user[0].customer_id}" onclick="validateEdit(this.value)">Simpan</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Ubah Data Pribadi');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+                }
+
+            })
+        }
+
+
+        function validateEdit(id) {
+            var fullName = $('#fullname').val()
+            var fullname = fullName.trim()
+            var dob = $('#dob').val()
+            var mobilephone = $('#mobile_phone').val()
+            
+            console.log("================")
+            console.log(fullname)
+            // console.log(fullname.trim().length==0)
+            if(fullname.length == 0 || dob.length == 0 || mobilephone.length == 0 || fullname.trim().length==0) {
+                if(fullname.length == 0 || fullname.trim().length==0) {
+                    if(fullname.trim().length==0) {
+                        $('#validationName').html('*Nama tidak valid') 
+                    } 
+                    if(fullname.length == 0) {
+                        $('#validationName').html('*Nama lengkap harus diisi') 
+                    }   
+                }
+                if(fullname.value.match(regEx)) {
+                    $('#validationName').html('*Nama tidak boleh hanya spasi') 
+                }      
+                if(dob.length == 0) {
+                    $('#validationDob').html('*Tanggal lahir harus diisi') 
+                }
+                if(mobilephone.length == 0) {
+                    $('#validationMopho').html('*Nomor handphone harus diisi')
+                } 
+            }
+            else {
+                editDataPribadi(id)
+            }  
+        }
+
+        function editDataPribadi(customer_id) {
+
+            const customerData = {
+                dob : $('#dob').val(),
+                biodataId : $('#biodata_id').val(),
+                gender : $('#gender').val(),
+                rhesusType : $('#biodata_id').val(),
+                weight : $('#weight').val(),
+                height : $('#height').val(),
+                modifiedOn : new Date().toISOString()
+            }
+
+            console.log(customerData)
+
+            $.ajax({
+                url:'http://localhost:8083/api/customer/'+ customer_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(customerData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+
+                    const biodataData = {
+                        fullName : $('#fullname').val().trim(),
+                        mobilePhone : $('#mobile_phone').val(),
+                        modifiedOn : new Date().toISOString()
+                    }
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/biodata/' + $('#biodata_id').val(),
+                        type:'PUT',
+                        dataType:'json',
+                        data:JSON.stringify(biodataData),
+                        contentType:'application/json',
+                        success:function(biodata) {
+                            console.log(biodata)
+                            $('#mymodal').modal('hide')
+                            loadDataPribadi()
+
+                        }
+                    })
+                }
+            })
+
+
+        }
+
+        function editFormAkun() {
+
+            $.ajax({
+                url:'http://localhost:8083/api/user/' + getCustLastLogin(),
+                type:'GET',
+                contentType: 'application/json',
+                success:function(user) {
+
+                    str = `
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Email*</td>
+                        </tr>
+                        <tr>
+                            <td style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;">
+                                ${user[0].email}
+                                <button onclick="editEmail()"style="width: fit-content; padding: 0; border: none; background: none; float: right; padding-right:10px;"><i class="fa fa-pencil" ></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Password*</td>
+                        </tr>
+                        <tr >
+                            <td style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;">
+                                ********
+                                <button onclick="editPassword()"style="width: fit-content; padding: 0; border: none; background: none; float: right; padding-right:10px;"><i class="fa fa-pencil" ></i></button>
+                            </td>
+                        </tr>
+                    </table> 
+                    `;
+                    btn = `
+                    <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Ubah Data Akun');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+                }
+            })
+
+        }
+
+        function editEmail() {
+            $.ajax({
+                url:'http://localhost:8083/api/user/'+getCustLastLogin(),
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(user) {
+                    console.log("BBBBBBBBBBBBBBBBBBB")
+                    console.log(user[0].email)
+                    password1 = user[0].password;
+                    biodataId1 = user[0].biodata_id;
+                    roleId1 = user[0].role_id;
+                    createdBy1 = user[0].created_by;
+                    createdOn1 = user[0].created_on;
+                    isDelete1 = user[0].is_delete;
+                    isLocked1 = user[0].is_locked;
+                    lastLogin1 = user[0].last_login;
+                    loginAttempt1 = user[0].login_attempt;
+                    str = `
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="font-size:12pt; font-family: 'Trebuchet MS', serif; color: #808080; padding-bottom:15px;">
+                                Masukkan email baru
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Email*</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" id="new_email" name="new_email" maxlength="255" value="${user[0].email}" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;">
+                                <span style="color: red; font-size: 10pt;" id="validationEmail"></span>
+                            </td>
+                        </tr>
+                    </table> 
+                    `;
+                    btn = `
+                    <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="validateEmail()">Ubah E-mail</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Ubah Email');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+                }
+            })
+        }
+
+        function validateEmail() {
+            var emailval = $('#new_email').val();
+            var pattern = /^[^ ]+@[^ ]+.[a-z]{2,3}$/;
+            if(emailval.length == 0){
+                $('#validationEmail').html('Email tidak boleh kosong')
+                count = 1;
+            }
+            else if(emailval.match(pattern)){
+                $.ajax({
+                    url:'http://localhost:8083/api/userbyemail',
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(user){
+                        var count = 0;
+                        for(i=0;i<user.length;i++) {
+                            console.log(user[i].email)
+                            if(emailval == user[i].email) {
+                                console.log("++++++++++++++++++++++")
+                                $('#validationEmail').html('*Email sudah terdaftar');
+                                count++;
+                            }
+                        }
+
+                        if(count==0) {
+                            console.log("=====================")
+                            kirimOtp()
+                        }
+                    }
+                })
+            }
+            else {
+                $('#validationEmail').html('*Email tidak valid')
+            }
+        }
+
+        function kirimOtp() {
+                $.ajax({
+                    url: 'http://localhost:8083/api/cekemail',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: $('#new_email').val(),
+                    contentType: 'application/json',
+                    success: function (result) {
+                        console.log(result);
+                        $('#hidden_otp').val(result);
+                        
+                        str = `
+                        <table>
+                            <tr>
+                                <td>
+                                    <p style="font-size:13pt; font-family: Calibri, serif;">Masukan kode OTP yang telah dikirimkan ke email Anda</p>
+                                    <input type="hidden" id = "hidden_otp">
+                                    <input type="text"  class="form-control" id="otp">
+                                    <span style="font-size: 12pt;" id="countdown"></span>
+                                </td>
+                            </tr>
+                        </table> `;
+                        btn = `
+                        <button type="button" class="btn btn-primary"onclick ="checkOtp()">Konfirmasi</button>
+                        `;
+
+                        $('#mymodal').modal('show');
+                        $('.modal-title').html('Konfirmasi OTP');
+                        $('.modal-body').html(str);
+                        $('.modal-footer').html(btn);
+
+                        // Set waktu target 3 menit dari sekarang
+                        var targetDate = new Date().getTime() + (25000);
+
+                        // Perbarui hitungan mundur setiap 1 detik
+                        var x = setInterval(function () {
+
+                            // Dapatkan waktu sekarang
+                            var now = new Date().getTime();
+
+                            // Hitung selisih waktu antara waktu target dan waktu sekarang
+                            var distance = targetDate - now;
+
+                            // Hitung waktu yang tersisa dalam menit dan detik
+                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            // Tampilkan hitungan mundur dalam elemen HTML
+                            $('#countdown').html('Kirim ulang kode OTP dalam '+ minutes +' menit '+ seconds+' detik') 
+                            // document.getElementById("countdown").innerHTML = "Kirim ulang kode OTP dalam " + minutes + ":" + seconds;
+
+                            // Jika waktu hitungan mundur habis, tampilkan pesan
+                            if (distance < 0) {
+                                clearInterval(x);
+                                $('#countdown').html('<a href="#" onclick = "'+kirimOtp()+'">Kirim ulang OTP</a>');
+                                // document.getElementById("countdown").innerHTML = " <a href = '#' onclick ='kirimOtp()'>Kirim ulang OTP</a>";
+                                // $('#hidden_otp').val('');
+                            }
+                        }, 1000);
+
+                    },
+                error: function (err) {
+                    console.log(err);
+                    $('#emailHelp').html(err.responseText); //responseText diambil dari return backend
+                }
+            })
+        }
+
+        function checkOtp() {
+            var otp = $('#otp').val();
+            $.ajax({
+                url: 'http://localhost:8083/api/checkotp',
+                type: 'GET',
+                dataType: 'json',
+                data: {token : otp},
+                contentType: 'application/json',
+                success: function(token){
+                    console.log(token);
+                    $('#id_token').val(token.id);
+
+                    const data = {
+                        password : password1,
+                        email : token.email,
+                        biodataId : biodataId1,
+                        roleId : roleId1,
+                        createdBy : createdBy1,
+                        createdOn : createdOn1,
+                        isDelete : isDelete1,
+                        isLocked : isLocked1,
+                        lastLogin : lastLogin1,
+                        loginAttempt : loginAttempt1,
+                        modifiedOn : new Date().toISOString(),
+                        modifiedBy : parseInt(getCustLastLogin())
+
+                    }
+
+                    console.log("++++++++++++++")
+
+                    console.log(data)
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/user/' +getCustLastLogin(),
+                        type:'PUT',
+                        dataType:'json',
+                        data:JSON.stringify(data),
+                        contentType:'application/json',
+                        success: function (result) {
+                            console.log(result)
+                            successEditEmail()
+                        }
+
+                    })
+
+                },
+                error: function(err){
+                    console.log(err);
+                    if (err.status === 400) {
+                        $('#otpHelp').html('OTP Kadaluarsa');
+                    } 
+                    else if (err.status === 404) {
+                        $('#otpHelp').html('OTP Salah');
+                    } 
+                    else {
+                        $('#otpHelp').html('Terjadi kesalahan');
+                    }
+                }
+            })
+        }
+  
+        function successEditEmail() {
+            str = `
+            <p>
+                Email berhasil diubah, silakan login kembali dengan email baru.
+            </p>
+            `;
+            btn = '<button type="button" class="btn btn-primary" onclick="logout()">Keluar</button>';
+            header = ''
+            $('.modal-footer').html(btn);
+            $('.modal-title').html('Ubah Password');
+            $('.modal-body').html(str);
+            
+        }
+        
+
+        function editPassword() {
+
+            $.ajax({
+                url:'http://localhost:8083/api/user/'+getCustLastLogin(),
+                type:'GET',
+                // async: false,
+                contentType: 'application/json',
+                success:function(user) {
+                    console.log("BBBBBBBBBBBBBBBBBBB")
+                    console.log(user[0].email)
+                    str = `
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="font-size:12pt; font-family: 'Trebuchet MS', serif; color: #808080; padding-bottom:15px;" colspan="2">
+                                Masukkan password Anda saat ini <br>
+                                <span style="color: red; font-size: 10pt;" id="validation"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Password*</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="input-group mb-3">
+                                    <input type="password" class="form-control" id="password">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-eye fa-lg" id="togglePassword" aria-hidden="true" onclick="togglePassword(this.id)"></i></span>
+                                </div> <br>
+                                <span style="color: red; font-size: 10pt;" id="validationPassword"></span>
+                                <input type="hidden" id = "biodata_id" value="${user[0].biodata_id}">
+                                <input type="hidden" id = "role_id" value="${user[0].role_id}">
+                                <input type="hidden" id = "password" value="${user[0].password}">
+                                <input type="hidden" id = "created_by" value="${user[0].created_by}">
+                                <input type="hidden" id = "created_on" value="${user[0].created_on}">
+                                <input type="hidden" id = "is_delete" value="${user[0].is_delete}">
+                                <input type="hidden" id = "last_login" value="${user[0].last_login}">
+                                <input type="hidden" id = "login_attempt" value="${user[0].login_attempt}">
+                            </td>
+                        <tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Masukkan ulang password*</td>
+                        </tr>
+                            <td colspan="2">
+                                <div class="input-group mb-3">
+                                    <input type="password" class="form-control" id="confirm_password">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-eye fa-lg" id="toggleConfirmPassword" aria-hidden="true" onclick="togglePassword(this.id)"></i></span>
+                                </div> <br>
+                                <span style="color: red; font-size: 10pt;" id="validationConfirm"></span>
+                            </td>
+                        </tr>
+                        </tr>
+                    </table> 
+                    `;
+                    btn = `
+                    <button type="button" class="btn btn-primary" onclick="validateOldPassword()">Ubah Password</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Ubah Password');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+                }
+            })
+
+        }
+
+        function validateOldPassword() {
+            var password = $('#password').val();
+            var confirm_password = $('#confirm_password').val();
+            if(password.length == 0 || confirm_password.length == 0) {
+                if(password.length == 0) {
+                    $('#validationPassword').html('*Password tidak boleh kosong')
+                }
+                if(confirm_password.length == 0) {
+                    $('#validationConfirm').html('*Password tidak boleh kosong')
+                }
+            }
+            else {
+                if(password!=confirm_password) {
+                    $('#validationConfirm').html('*Password tidak sama')
+                }
+                else {
+                    var check_password = CryptoJS.SHA256(password).toString();
+                    console.log("66666666666666")
+                    console.log(check_password)
+                    $.ajax({
+                        url:'http://localhost:8083/api/user/'+getCustLastLogin(),
+                        type:'GET',
+                        async: false,
+                        contentType: 'application/json',
+                        success:function(user) {
+                            console.log(user[0].password)
+                            console.log("0000000000000")
+                            if(check_password != user[0].password) {
+                                $('#validation').html('*Password yang Anda masukkan tidak sesuai')
+                            }
+                            else { 
+                                editPasswordNew()
+                            }
+                        }
+                    })
+                }
+            }
+        }
+
+        function editPasswordNew() {
+
+            $.ajax({
+                url:'http://localhost:8083/api/user/'+getCustLastLogin(),
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(user) {
+                    str = `
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="font-size:12pt; font-family: 'Trebuchet MS', serif; color: #808080; padding-bottom:15px;" colspan="2">
+                                Masukkan password baru <br>
+                                </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Password*</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <div class="input-group mb-3">
+                                    <input type="password" class="form-control" id="new_password">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-eye fa-lg" id="toggleNewPassword" aria-hidden="true" onclick="togglePassword(this.id)"></i></span>
+                                </div> <br>
+                                <span class="validateForm" id="validationPassword" style="color: red; font-size: 10pt;"></span> <br>
+                                <span class="validateForm" id="validateUpper" style="color: red; font-size: 10pt;"></span> <br>
+                                <span class="validateForm" id="validateLower" style="color: red; font-size: 10pt;"></span> <br>
+                                <span class="validateForm" id="validateNumber" style="color: red; font-size: 10pt;"></span> <br>
+                                <span class="validateForm" id="validateSpesial" style="color: red; font-size: 10pt;"></span> <br>
+                                <input type="hidden" id = "email" value="${user[0].email}">
+                                <input type="hidden" id = "biodata_id" value="${user[0].biodata_id}">
+                                <input type="hidden" id = "role_id" value="${user[0].role_id}">
+                                <input type="hidden" id = "created_by" value="${user[0].created_by}">
+                                <input type="hidden" id = "created_on" value="${user[0].created_on}">
+                                <input type="hidden" id = "is_delete" value="${user[0].is_delete}">
+                                <input type="hidden" id = "is_locked" value="${user[0].is_locked}">
+                                <input type="hidden" id = "last_login" value="${user[0].last_login}">
+                                <input type="hidden" id = "login_attempt" value="${user[0].login_attempt}">
+                            </td>
+                        <tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Masukkan ulang password*</td>
+                        </tr>
+                            <td colspan="2">
+                                <div class="input-group mb-3">
+                                    <input type="password" class="form-control" id="confirm_new_password">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-eye fa-lg" id="toggleConfirmNewPassword" aria-hidden="true" onclick="togglePassword(this.id)"></i></span>
+                                </div> <br>
+                                <span style="color: red; font-size: 10pt;" id="validationConfirm"></span>
+                            </td>
+                        </tr>
+                        </tr>
+                    </table> 
+                    `;
+                    btn = `
+                    <button type="button" class="btn btn-primary" onclick="validateNewPassword()">Ubah Password</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Ubah Password');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+                }
+            })
+
+        }
+
+        function validateNewPassword() {
+            var password = $('#password').val();
+            var new_password = $('#new_password').val();
+            var confirm_new_password = $('#confirm_new_password').val();
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W])[A-Za-z\d\W]{8,}$/;
+            const regex1 = /[A-Z]/g;
+            const regex2 = /[a-z]/g;
+            const regex3 = /[\W]/g;
+            const numbers = /[0-9]/g;
+
+            const passwordLama = password;
+
+            if(new_password.length == 0 || confirm_new_password.length == 0) {
+                if(new_password.length == 0) {
+                    $('#validationPassword').html('*Password tidak boleh kosong')
+                }
+                if(confirm_new_password.length == 0) {
+                    $('#validationConfirm').html('*Password tidak boleh kosong')
+                }
+            }
+            else {
+                if(new_password.length < 8 || confirm_new_password.length < 8) {
+                    if(new_password.length == 0) {
+                        $('#validationPassword').html('*Password minimal 8 karakter')
+                    }
+                    if(confirm_new_password.length == 0) {
+                        $('#validationConfirm').html('*Password minimal 8 karakter')
+                    }
+                }
+                else{
+                    if(new_password!=confirm_new_password) {
+                        $('#validationConfirm').html('*Password tidak sama')
+                    }
+                    else {
+                        if(new_password == password) {
+                            $('#validation').html('*Password tidak boleh sama dengan password lama')
+                        }
+                        else { 
+                            // if(numbers.test(password) == false || regex1.test(password) == false || regex2.test(password) == false || regex3.test(password) == false) {
+                                // $('#validationPassword').html('')
+                                // if(regex2.test(password) == false){
+                                //     $('#validateLower').html('*Password harus mengandung huruf kecil')
+                                // }
+                                // else{
+                                //     $('#validateLower').html('')
+                                // }
+                                // if(regex1.test(password) == false){
+                                //     $('#validateUpper').html('*Password harus mengandung huruf besar')
+                                // }
+                                // else {
+                                //     $('#validateUpper').html('')
+                                // }
+                                // if(numbers.test(password) == false){
+                                //     $('#validateNumber').html('*Password harus mengandung angka')
+                                // }
+                                // else {
+                                //     $('#validateNumber').html('')
+                                // }
+
+                                // if(regex3.test(password) == false){
+                                //     $('#validateSpesial').html('*Password harus mengandung karakter spesial')
+                                // }
+                                // else{
+                                //     $('#validateSpesial').html('')
+                                // }
+                                        
+                                // }
+                                //     else {
+                                        var password_baru =  CryptoJS.SHA256(new_password).toString();
+                                        
+                                        console.log("KKKKKKKKKKKKKK")
+                                        console.log(new_password)
+                                        const data = {
+                                            password : password_baru,
+                                            email : $('#email').val(),
+                                            biodataId : $('#biodata_id').val(),
+                                            roleId : $('#role_id').val(),
+                                            createdBy : $('#created_by').val(),
+                                            createdOn : $('#created_on').val(),
+                                            isDelete : $('#is_delete').val(),
+                                            isLocked : $('#is_locked').val(),
+                                            lastLogin : $('#last_login').val(),
+                                            loginAttempt : $('#login_attempt').val(),
+                                            modifiedOn : new Date().toISOString(),
+                                            modifiedBy : parseInt(getCustLastLogin()),
+
+                                        }
+
+                                        console.log("++++++++++++++")
+
+                                        console.log(data)
+
+                                        $.ajax({
+                                            url:'http://localhost:8083/api/user/' +getCustLastLogin(),
+                                            type:'PUT',
+                                            dataType:'json',
+                                            data:JSON.stringify(data),
+                                            contentType:'application/json',
+                                            success: function (result) {
+                                                console.log(result)
+                                                // $('#mymodal').modal('hide')
+                                                successEditPassword()
+                                                
+                                                const data1 = {
+                                                    oldPassword : passwordLama,
+                                                    newPassword : new_password,
+                                                    resetFor : 'Ubah password'
+                                                }
+
+                                                console.log(data1)
+
+                                                $.ajax({
+                                                    url:'http://localhost:8083/api/resetpassword',
+                                                    type:'POST',
+                                                    dataType:'json',
+                                                    data:JSON.stringify(data1),
+                                                    contentType:'application/json',
+                                                    success:function(result) {
+                                                        console.log("((((((((((()))))))))))")
+                                                        console.log(result)
+                                                    }
+                                                })
+                                            }
+
+                                        })
+
+                                    }
+                                }
+                            }
+
+                    }
+                }
+
+            // }
+
+
+        function togglePassword(id) {
+                var password = document.getElementById("password");
+                var passwordConfirm = document.getElementById("confirm_password");
+                var new_password = document.getElementById("new_password");
+                var new_passwordConfirm = document.getElementById("confirm_new_password");
+                var passwordLogin = document.getElementById("password_login");
+                
+                var togglePassword = document.getElementById(id);
+
+
+                if (togglePassword.id === "togglePassword") {
+                    if (password.type === "password") {
+                        password.type = "text";
+                        togglePassword.classList.remove("fa-eye");
+                        togglePassword.classList.add("fa-eye-slash");
+                    } else {
+                        password.type = "password";
+                        togglePassword.classList.remove("fa-eye-slash");
+                        togglePassword.classList.add("fa-eye");
+                    }
+                }
+                
+                if (togglePassword.id === "toggleConfirmPassword") {
+                    if (passwordConfirm.type === "password") {
+                        passwordConfirm.type = "text";
+                        togglePassword.classList.remove("fa-eye");
+                        togglePassword.classList.add("fa-eye-slash");
+                    } else {
+                        passwordConfirm.type = "password";
+                        togglePassword.classList.remove("fa-eye-slash");
+                        togglePassword.classList.add("fa-eye");
+                    }
+                }
+
+                if (togglePassword.id === "toggleNewPassword") {
+                    if (new_password.type === "password") {
+                        new_password.type = "text";
+                        togglePassword.classList.remove("fa-eye");
+                        togglePassword.classList.add("fa-eye-slash");
+                    } else {
+                        new_password.type = "password";
+                        togglePassword.classList.remove("fa-eye-slash");
+                        togglePassword.classList.add("fa-eye");
+                    }
+                }
+                
+                if (togglePassword.id === "toggleConfirmNewPassword") {
+                    if (new_passwordConfirm.type === "password") {
+                        new_passwordConfirm.type = "text";
+                        togglePassword.classList.remove("fa-eye");
+                        togglePassword.classList.add("fa-eye-slash");
+                    } else {
+                        new_passwordConfirm.type = "password";
+                        togglePassword.classList.remove("fa-eye-slash");
+                        togglePassword.classList.add("fa-eye");
+                    }
+                }
+                
+            }
+
+            // function saveResetPassword(id) {
+
+            //     const data = {
+            //         oldPassword : document.getElementById("password"),
+            //         newPassword : document.getElementById("new_password"),
+            //         resetFor : 'Ubah password'
+            //     }
+
+            //     console.log(data)
+
+
+                // $.ajax({
+                //     url:'http://localhost:8083/api/resetpassword',
+                //     type:'POST',
+                //     dataType:'json',
+                //     data:JSON.stringify(data),
+                //     contentType:'application/json',
+                //     success:function(result) {
+                //         console.log("((((((((((()))))))))))")
+                //         console.log(result)
+                //     }
+                // })
+            // }
+
+        function successEditPassword() {
+            str = `
+            <p>
+                Password berhasil diubah, silakan login kembali dengan password baru.
+            </p>
+            `;
+            btn = '<button type="button" class="btn btn-primary" onclick="logout()">Keluar</button>';
+            header = ''
+            $('.modal-footer').html(btn);
+            $('.modal-title').html('Ubah Password');
+            $('.modal-body').html(str);
+            
+        }
+
+        function logout() {
+            window.location.href = "/home";
+        }
+
+
+        function getCustLastLogin() {
+            $.ajax({
+                url:'http://localhost:8083/api/custlastlogin',
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(customer){
+                    value = customer[0].user_id;
+                }
+            })
+            return value;
+        }
+
+        console.log(getCustLastLogin())
+
+        function closeButton() {
+            $('#mymodal').modal('hide')
+            loadDataPribadi()
+            loadDataAkun()
+        }
+
+        $('.datepicker').datepicker({
+            format: 'yyyy-MM-dd',
+        });
+
+
+        function extractYear() {
+            $.ajax({
+                url:'http://localhost:8083/api/extractyear/'+ getCustLastLogin(),
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(customer){
+                    data = customer[0].tahun_join;
+                    $('#dataTahun').html(data);
+                    console.log(customer[0].tahun_join)
+                }   
+
+            })
+        }
+
+
+        extractYear()
+
+    //     function formFoto() {
+            
+    //         $.ajax({
+    //             url:'http://localhost:8083/api/user',
+    //             type:'GET',
+    //             async: false,
+    //             contentType: 'application/json',
+    //             success:function(customer){
+    //                     str = `<table>
+    //                     <tr>
+    //                     <td>Foto</td>
+    //                     <td>
+    //                     <input type="text" id="photo" class="form-control">
+    //                     <input type="file" id="filename" name="photofile" onchange="readurl(this)" class="form-control">
+    //                     <br><img src="#" id="avatar" alt="Photo" height="80">
+    //                     </td>
+    //                     </tr>
+    //                     </table>`;
+    //                     btn = `<button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+    //                         '<button type="button" class="btn btn-primary" onclick="validateEmail()">Simpan</button>`;
+    //                 $('#mymodal').modal('show');
+    //                 $('.modal-title').html('Edit Foto');
+    //                 $('.modal-body').html(str);
+    //                 $('.modal-footer').html(btn);
+    //             }
+
+    //         })
+    //     }
+
+    //     function readurl(input) {
+    //     if (input.files && input.files[0]) {
+    //         var reader = new FileReader();
+    
+    //         reader.onload = function (e) {
+    //             $('#avatar').attr('src', e.target.result);
+    //             $('#photo').val($('input[type=file]').val().replace(/C:\\fakepath\\/i,''))
+    //         };
+    
+    //         reader.readAsDataURL(input.files[0]);
+    //     }
+    // }
+
+    </script>
+
+</div>
+
+</body>
+</html>

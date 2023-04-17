@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Hubungan Pasien</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <p>
+        <h3 align="center">Daftar Hubungan Pasien</h3>
+        <input class="form-control" type="search" style="float:left; width: 30%;" placeholder="Cari berdasarkan nama" aria-label="Search" id="searchcustrelation" oninput="search(this.value)">
+        <button 
+        onclick="addForm()"
+        style="float:right;"
+        class="btn btn-primary">
+        +
+        </button>
+    </p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Hubungan</th>
+                <th>Tindakan</th>
+            </tr>
+        </thead>
+
+        <tbody id="custRelationData">
+
+        </tbody>
+    </table>
+
+    <script>
+        loadCustRelation();
+        function loadCustRelation() {
+            $.ajax({
+            url:'http://localhost:8083/api/custrelation',
+            type:'GET',
+            contentType: 'application/json',
+            success:function(custrelation) {
+                console.log(custrelation) 
+                var str = '';
+                for(i=0; i< custrelation.length; i++) {
+                    str += '<tr>';
+                    str += '<td>' + custrelation[i].name + '</td>'; 
+                    str += `<td>
+                        <button class="btn btn-warning" value ="${custrelation[i].id}" onclick = "editForm(this.value)"><i class="fa fa-pencil"></i></button>
+                        <button class="btn btn-danger" value ="${custrelation[i].id}" onclick = "deleteForm(this.value)"><i class="fa fa-trash"></i></button>
+                    </td>`;                                                          
+                    str += '</tr>';
+                }
+                $('#custRelationData').html(str);
+                // $('#custrelTable').DataTable();
+                
+            }
+            })   
+        }
+
+        function search(name) {
+            if (name) {
+                $.ajax({
+                    url:'http://localhost:8083/api/custrelationbyname/' + name,
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(custrelation) {
+                        console.log(custrelation)
+                        str = ''
+                        for(i=0; i< custrelation.length; i++) {
+                            str += '<tr>';
+                            str += '<td>' + custrelation[i].name + '</td>'; 
+                            str += `<td>
+                                <button class="btn btn-warning" value ="${custrelation[i].id}" onclick = "editForm(this.value)"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger" value ="${custrelation[i].id}" onclick = "deleteForm(this.value)"><i class="fa fa-trash"></i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+                        }
+                        $('#custRelationData').html(str)
+                    }
+                })
+            } 
+            else {
+                loadCustRelation()
+            }    
+        }
+
+        function addForm() {
+            str = `
+            <table class="table">
+                <tr>
+                    <td>Hubungan*</td>
+                    <td>
+                        <input type="text" id = "name" maxlength="5"> <br>
+                        <span style="color: red; font-size: 10pt;" id="validation"></span>
+                    </td>
+                </tr>
+            </table> `;
+            btn = `
+                <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="validateAdd()">Simpan</button>
+            `;
+            
+            $('#mymodal').modal('show');
+            $('.modal-title').html('Tambah Hubungan Pasien');
+            $('.modal-body').html(str);
+            $('.modal-footer').html(btn);
+
+        }
+
+        function validateAdd() {
+            var name = $('#name').val()
+            if(name.length == 0) {
+                $('#validation').html('*Hubungan harus diisi')
+            } else {
+                saveCustRelation()
+            }  
+        }
+
+        function saveCustRelation() {
+
+            const custRelationData = {
+                name : $('#name').val(),
+                createdOn : new Date().toISOString()
+            }
+
+            $.ajax({
+                url:'http://localhost:8083/api/custrelation',
+                type:'POST',
+                dataType:'json',
+                data:JSON.stringify(custRelationData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+                    loadCustRelation()
+                }
+            })
+        }
+
+        function editForm(custrel_id) {
+            $.ajax({
+                url:'http://localhost:8083/api/custrelation/' + custrel_id,
+                type: 'GET',
+                contentType:'application/json',
+                success:function(custrelation) {
+                    str = `
+                    <table class="table">
+                        <tr>
+                            <td>Hubungan*</td>
+                            <td>
+                                <input type="text" id = "name" maxlength="5" value="${custrelation.name}"> <br>
+                                <span style="color: red; font-size: 10pt;" id="validation"></span>
+                                <input type="hidden" id = "created_on" value="${custrelation.createdOn}">
+                            </td>
+                        </tr>
+                    </table> `;
+                    btn = `
+                        <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                        <button type="button" class="btn btn-primary" value = "${custrelation.id}" onclick ="validateEdit(this.value)">Simpan</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Edit Hubungan Pasien');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+
+                }
+
+            })
+        }
+
+        function validateEdit(id) {
+            var name = $('#name').val()
+            if(name.length == 0) {
+                $('#validation').html('*Hubungan harus diisi')
+            } else {
+                editCustRelation(id)
+            }  
+        }
+
+        function editCustRelation(custrel_id) {
+
+            const custRelationData = {
+                name : $('#name').val(),
+                modifiedOn : new Date().toISOString(),
+                createdOn : $('#created_on').val()
+            }
+
+            $.ajax({
+                url:'http://localhost:8083/api/custrelation/'+ custrel_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(custRelationData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+                    loadCustRelation()
+                }
+            })
+        }
+
+        function deleteForm(custrel_id) {
+
+            $.ajax({
+                url:'http://localhost:8083/api/custrelation/' + custrel_id,
+                type: 'GET',
+                contentType:'application/json',
+                success:function(custrelation) {
+                    str = `
+                    <table class="table">
+                        <tr>
+                            <td>Hubungan</td>
+                            <td>
+                                ${custrelation.name}
+                                <input type="hidden" id = "name" value="${custrelation.name}">
+                                <input type="hidden" id = "created_on" value="${custrelation.createdOn}">
+                                <input type="hidden" id = "modified_on" value="${custrelation.modifiedOn}">
+                            </td>
+                        </tr>
+                    </table> `;
+                    btn = `
+                    <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                    <button type="button" class="btn btn-danger" value = "${custrelation.id}" onclick ="deleteCustRelation(this.value)">Hapus</button>
+                    `;
+
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Hapus Hubungan Pasien');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+
+                }
+            })
+        }
+
+        function deleteCustRelation(custrel_id) {
+
+            const custRelationData = {
+                name : $('#name').val(),
+                deletedOn : new Date().toISOString(),
+                modifiedOn : $('#modified_on').val(),
+                createdOn : $('#created_on').val(),
+                isDelete : true
+            }
+
+            $.ajax({
+                url:'http://localhost:8083/api/custrelation/'+ custrel_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(custRelationData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+                    loadCustRelation()
+                }
+            })
+
+        }
+
+        function closeButton() {
+            $('#mymodal').modal('hide')
+            loadCustRelation()
+        }
+
+    </script>
+
+</div>
+
+</body>
+</html>

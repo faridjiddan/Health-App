@@ -1,0 +1,40 @@
+.container-4{
+    overflow: hidden;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.container-4 input#search{
+    width: 350px;
+    height: 36px;
+    border: 1px solid #668cff;
+    font-size: 10pt;
+    float: left;
+    padding-left: 15px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.container-4 button.icon{
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 1px solid #668cff;
+    height: 36px;
+    width: 36px;
+    font-size: 10pt;
+    color: #fff;
+    background-color: #668cff;
+}
+
+.pagination li:hover{
+    cursor: pointer;
+}
+
+.nav-link {
+    color: #0096c7;
+    font-weight: bold;
+}
+

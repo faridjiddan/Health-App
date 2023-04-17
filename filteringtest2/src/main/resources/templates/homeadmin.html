@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{fragments/layoutrole}">
+<head>
+    <title>Index</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- <div> -->
+            <div class="row" id="menuData">
+                User ID: <span th:text="${userId}"></span>
+                
+                Email: <span th:text="${email}" id="email"></span>
+                
+                Role ID: <span th:text="${roleId}"></span>
+                
+                Fullname: <span th:text="${fullname}"></span>
+
+                <a href="/bloodtype/index">Golongan darah</a>
+            </div>
+    <!-- </div> -->
+    <script>
+        $('#email').html(localStorage.getItem("email"));
+        $('#userId').html(localStorage.getItem("userId"));
+    // loadMenu()
+    //    function loadMenu() {
+    //     $.ajax({
+    //         url:'http://localhost:5000/menu/1/1',
+    //         type:'GET',
+    //         contentType:'application/json',
+    //         success:function(menu) {
+    //             console.log(menu)
+    //             var str = '';
+    //             str += '<div class="container">';
+    //             str += '<div class="row">';
+    //                 for(i = 0; i < menu.length; i++) {
+    //                     str += '<div class="col">'
+    //                         // str += '<div class = "card" style = "width: 7rem;">'
+    //                         if(menu[i].big_icon == null) {
+    //                             str += `<img src = "/images/doctor.png">`
+    //                         } else {
+    //                             str+= '<figure>'
+    //                             str += `<img src = "/images/${menu[i].big_icon}" style="height:65px;">`
+    //                             str+= `<figcaption class="" style="">${menu[i].name}</figcaption>`
+    //                             str+= '</figure>'
+    //                         }
+    //                         str += '<br>'
+    //                         // str+= '<div class = "card body">'
+    //                     str += '</div>'
+
+    //                 }
+    //             str += '</div>';
+    //             str += '</div>';
+    //             $('#menuData').html(str)
+    //         }
+    //     })
+    //    }
+       
+    </script>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,133 @@
+<!Doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Landing Page</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    </link>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    </link>
+    <link rel="stylesheet" href="/css/custom.css">
+    </link>
+
+    <script src="/js/jquery-3.6.3.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- untuk validasi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <!-- untuk hashing di javascript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Modal -->
+    <div class="modal fade" id="mymodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgb(219, 244, 251);">
+        <div class="container-fluid">
+            <img src="/images/plus-icon.jpeg" style="padding-left: 50px;">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <a class="navbar-brand" href=""
+                    style="color: rgb(44, 156, 219); font-size: 30px;  padding-bottom: 10px; padding-right: 10px;">Med.Id</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                    <form class="d-flex">
+                        <input class="form-control form-control-sm" type="text" placeholder="Cari Dokter atau Faskes"
+                            aria-label="Search" size="100" style="margin:5px;">
+                        <span>
+                            <button type="button" onclick="searchText()"
+                                class="btn btn-outline-secondary border-start-0 border-bottom-0 border ms-n5"
+                                style="background-color: rgb(44, 156, 219); margin:5px;">
+                                <i class="fa fa-search" style="color: white;"></i>
+                            </button>
+                        </span>
+
+                        <button class="btn btn-primary btn-sm" type="button" onclick="emailModal('daftar')"
+                            style="width: 100px; margin: 10px; color: rgb(44, 156, 219); background-color: white;">Daftar</button>
+
+                        <button class="btn btn-primary btn-sm" type="button" onclick="loginModal()"
+                            style="width: 100px; margin: 10px; color: white; background-color: rgb(44, 156, 219);">Masuk</button>
+                    </form>
+            </ul>
+
+        </div>
+        </div>
+    </nav>
+
+    <div id="content">
+        <span>
+            <section layout:fragment="content" style="padding:7rem; display: flex; justify-content: center;"
+                id="baseContent"></section>
+        </span>
+    </div>
+
+    <footer class="footer mt-auto py-3"
+        style="position: absolute; bottom: 0; width: 100%; height: 140px; background-color:rgb(135, 219, 247);">
+        <div class="container text-muted">
+            <div class="row" style="padding-left: 100px; font-size: small;">
+                <div class="col">
+                    <a><small><b>Contact Information</b></small></a><br>
+                    <a><small>Satrio Tower Building, 25th Floor, Jl. Prof Dr. Satrio Kav C4</small></a><br>
+                    <a><small>Jakarta Selatan 12950, Indonesia</small></a><br>
+                    <a><small>Email: contact@xsis.academy</small></a><br>
+                    <a><small>Phone +62 21 2788 3570</small></a><br>
+                    <a><small>Fax. +62 21 2788 3573</small></a>
+                </div>
+                <div class="col">
+                    <a><small><b>Team Java Batch 313B</b></small></a><br>
+                    <a><small>Dio Riksa Anugrah</small></a><br>
+                    <a><small>Fariduddin Jiddan</small></a><br>
+                    <a><small>Firsta Rifa</small></a><br>
+                    <a><small>Hasnadhia Raufani</small></a><br>
+                    <a><small>Nur Ikhsan Imanudin</small></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function searchText() {
+            $.ajax({
+                url: 'http://localhost:8083/search/index',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (result) {
+                    window.open('http://localhost:8083/search/index', '_self')
+                    console.log(result)
+                }
+            })
+        }
+
+        function signupPage() {
+
+        }
+
+        function loginPage() {
+
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/sharedlayout}">
+
+<head>
+    <title>Pasien</title>
+    <link rel="stylesheet" href="/css/mystyle.css"></head></link>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    
+
+<div class="box" style="margin-bottom: 100px;">
+    <h style="margin-left: 15px; font-size: 16pt; font-family: Verdana, sans-serif; color: #668cff;">Daftar Pasien</h>
+    <div class="box" style="border: 2px solid #448dee; border-radius: 5px; padding: 10px; margin: 15px;">
+
+    <div class="container" style="margin-top: 50px;">
+        <div class="row">
+            <div class="col-8">
+                <div class="box" style="margin-left: 20px;">
+                    <div class="container-4">
+                      <input type="text" id="search" style="font-family: Calibri, serif; font-size: 13pt;" placeholder="Cari nama pasien..."/>
+                      <button type="submit" class="icon" onclick="search(document.getElementById('search').value)"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="box">
+                    <div class="container-4">
+                        <h style="height: 36.5px; font-size:13pt; font-family: Calibri, serif; padding-right: 10px; color: #808080;">Urutkan </h>
+                        <select id="sort" name="sort" style="width:60%; height: 36.5px; margin-right: 60px; padding-right: 15px; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;">
+                            <option value="" style="color: #808080;">---Pilih---</option>
+                            <option value="name">Nama</option>
+                            <option value="age">Usia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="padding-top: 30px;">
+            <div class="col-4">
+                <div class="container-4">
+                    <button id="multipledelete" type="button" style="font-size:10pt; color:#448dee; padding: 2; background: none; border: 1px solid #448dee; border-radius: 5px;"><i class="fa fa-trash" style="font-size:10pt;">&nbsp; Hapus </i></button>
+                </div>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-4">
+                <div class="row">
+                    <div class="col" style="padding-right: 0;">
+                        <button onclick="sortCustomerAsc()" style="font-size:10pt;color:#448dee; padding: 0; border: none; background: none;">
+                            A-Z
+                        </button>
+                        <button onclick="sortCustomerDesc()" style="font-size:10pt;color:#448dee; padding: 0; border: none; background: none;">
+                            Z-A
+                        </button>
+                    </div>
+                    <div class="col" style="border-right: 1px solid #448dee; border-left: 1px solid #448dee; padding-right: 0;">
+                        <select name="maxRows" id="maxRows" style="width: auto; font-size:10pt;color:#448dee; padding: 0; border: none; background: none;">
+                            <option value="" style="color: #808080;" selected>---Pilih---</option>
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                        </select>                      
+                    </div>
+                    <div class="col" style="margin-left: 0%; margin-right: auto;">
+                        <button onclick="addForm()" style="padding: 0; border: none; background: none;">
+                        <i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Tambah </i>
+                    </button>
+                     </div> 
+            </div>
+        </div>
+
+    </div>
+
+    <div>
+        <table class="table" id="tableData">
+        <thead>
+            <tr>
+                <th style="width: 50px;"></th>
+                <th style="width: auto;"></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody id="custData">
+        </tbody>
+    </table>
+    </div>
+
+    <div class="container-4" style="margin-left: 400px;">
+       <!-- <h style="color: #808080;">Menampilkan x-y dari z data</h> -->
+        <div class="box">
+		<div class='container-4' style="padding: 10px;">
+			<nav>
+				<ul class="pagination">
+                    <li data-page="prev" >
+						<span> <h style="color: #808080; border: 1px solid #448dee; padding: 2px;">Sebelumnya</h> <span class="sr-only"> (current) </span> </span>
+					</li> 
+                    <li data-page="next" id="prev">
+						<span> <h style="color: #808080; border: 1px solid #448dee; padding: 2px;">Selanjutnya</h> <span class="sr-only"> (current)</span> </span>
+					</li>
+				</ul>
+			</nav>
+		</div>
+        </div>
+    </div>
+
+
+    </div>
+</div>
+
+    <script>     
+
+
+        function getCustLastLogin() {
+            $.ajax({
+                url:'http://localhost:8083/api/custlastlogin',
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(customer){
+                    value = customer[0].customer_id;
+                }
+            })
+            return value;
+        }
+
+        function getUserLastLogin() {
+            $.ajax({
+                url:'http://localhost:8083/api/custlastlogin',
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(customer){
+                    value = customer[0].user_id;
+                }
+            })
+            return value;
+        }
+
+
+        function getBiodataLastLogin() {
+            $.ajax({
+                url:'http://localhost:8083/api/custlastlogin',
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(customer){
+                    value = customer[0].biodata_id;
+                }
+            })
+            return value;
+        }
+
+        loadData();
+        function loadData() {
+            var str = '';
+            $.ajax({
+                url:'http://localhost:8083/api/customer/' +getBiodataLastLogin(),
+                type:'GET',
+                contentType: 'application/json',
+                success:function(customer) {
+                    console.log(customer)
+                    var chat = '';
+                    var janji = '';
+                    for(i=0; i< customer.length; i++) {
+
+                        str += '<tr>';
+                        str += '<td style="width: 50px;"> <br> <input type="checkbox" value = "'+ customer[i].id +'" id="checkboxdelete" name="checkboxdelete" style="height: 17px; width: 17px;background-color: #eee; outline: 1px solid #448dee; box-shadow: 0 0 0 1pt #448dee; border-radius: 5px; left-margin: 10px; right-margin:10px;"> <br> </td>';
+                        str += '<td style="width: auto;"> <p style="font-size:13pt; font-family: Verdana, serif; color: #668cff; padding:0; margin:0;">' + customer[i].fullname + '</p> <p style="font-size:12pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;">' + customer[i].name + ',\t' + customer[i].usia + '\t tahun' + '</p>'
+
+                                $.ajax({
+                                    url:'http://localhost:8083/api/getchatdata/' + customer[i].id,
+                                    type:'GET',
+                                    async: false,
+                                    contentType: 'application/json',
+                                    success:function(datachat){
+                                        if(datachat.length>0) {
+                                            chat = datachat[0].jumlah_chat
+                                            str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>'+chat+'</h> Chat online, '
+                                                $.ajax({
+                                                    url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                    type:'GET',
+                                                    async: false,
+                                                    contentType: 'application/json',
+                                                    success:function(datajanji){
+                                                        if(datajanji.length>0) {
+                                                            janji  = datajanji[0].jumlah_janji;
+                                                            str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                        }
+                                                        else {
+                                                            str += '<h>0</h> Janji dokter</p>';
+                                                        }
+                        
+                                                    }   
+
+                                                })
+                                        }
+                                        else {
+                                            str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>0</h> Chat online, '
+                                                $.ajax({
+                                                    url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                    type:'GET',
+                                                    async: false,
+                                                    contentType: 'application/json',
+                                                    success:function(datajanji){
+                                                        if(datajanji.length>0) {
+                                                            janji  = datajanji[0].jumlah_janji;
+                                                            str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                        }
+                                                        else {
+                                                            str += '<h>0</h> Janji dokter</p>';
+                                                        }
+                
+                                                    }   
+
+                                                })
+                                        }
+                                    }   
+                                })
+
+                        str += `<td style="vertical-align: middle; text-align:right;">
+                            <button class="btn btn-sm" value = "${customer[i].id}" onclick = "editForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Ubah </i></button> &ensp;
+                            <button class="btn btn-sm" value = "${customer[i].id}" onclick = "deleteForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-trash" style="font-size:10pt;color:#448dee;">&nbsp; Hapus </i></button>
+                        </td>`;                                                          
+                        str += '</tr>';
+
+                    }
+                    $('#custData').html(str);
+                }
+            })
+        }
+
+        getPagination('#tableData');
+
+        function getPagination(table) {
+            var lastPage = 1;
+            $('#maxRows').on('change', function(evt) {
+                lastPage = 1;
+                $('.pagination').find('li').slice(1, -1).remove();
+                var trnum = 0;
+                var maxRows = parseInt($(this).val());
+
+                if (maxRows == 5000) {
+                    $('.pagination').hide();
+                } else {
+                    $('.pagination').show();
+                }
+
+                var totalRows = $(table + ' tbody tr').length;
+                $(table + ' tr:gt(0)').each(function() {
+                    trnum++;
+                    if (trnum > maxRows) {
+                        $(this).hide();
+                    }
+                    if (trnum <= maxRows) {
+                        $(this).show();
+                    }
+                });
+                if (totalRows > maxRows) {
+                    var pagenum = Math.ceil(totalRows / maxRows);
+                    for (var i = 1; i <= pagenum; ) {
+                        $('.pagination #prev').before('<li data-page="' + i + '">\<span>' + i++ + '<span class="sr-only">(current)</span></span>\</li>').show();
+                    }
+                }
+                $('.pagination [data-page="1"]').addClass('active');
+                $('.pagination li').on('click', function(evt) {
+                    evt.stopImmediatePropagation();
+                    evt.preventDefault();
+                    var pageNum = $(this).attr('data-page');
+                    var maxRows = parseInt($('#maxRows').val());
+
+                    if (pageNum == 'prev') {
+                        if (lastPage == 1) {
+                            return;
+                        }
+                        pageNum = --lastPage;
+                    }
+                    if (pageNum == 'next') {
+                        if (lastPage == $('.pagination li').length - 2) {
+                            return;
+                        }
+                        pageNum = ++lastPage;
+                    }
+
+                    lastPage = pageNum;
+                    var trIndex = 0;
+                    $('.pagination li').removeClass('active');
+                    $('.pagination [data-page="' + lastPage + '"]').addClass('active');
+                    limitPagging();
+                    $(table + ' tr:gt(0)').each(function() { 
+                    trIndex++; 
+                    if (
+                        trIndex > maxRows * pageNum ||
+                        trIndex <= maxRows * pageNum - maxRows
+                    ) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                    });
+                });
+                limitPagging();
+            })
+                .val(10)
+                .change();
+        }
+
+        function limitPagging(){
+            if($('.pagination li').length > 7 ) {
+                if( $('.pagination li.active').attr('data-page') <= 3 ) {
+                        $('.pagination li:gt(5)').hide();
+                        $('.pagination li:lt(5)').show();
+                        $('.pagination [data-page="next"]').show();
+                }
+                if ($('.pagination li.active').attr('data-page') > 3){
+                        $('.pagination li:gt(0)').hide();
+                        $('.pagination [data-page="next"]').show();
+                        for( let i = ( parseInt($('.pagination li.active').attr('data-page'))  -2 )  ; i <= ( parseInt($('.pagination li.active').attr('data-page'))  + 2 ) ; i++ ){
+                            $('.pagination [data-page="'+i+'"]').show();
+                        }
+
+                }
+            }
+        }
+
+        // $(function() {
+        // $('table tr:eq(0)').prepend('<th> ID </th>');
+
+        // var id = 0;
+
+        // $('table tr:gt(0)').each(function() {
+        //     id++;
+        //     $(this).prepend('<td>' + id + '</td>');
+        // });
+        // });
+
+        function search(name) {
+            if(document.getElementById('search').value) {
+                var str = '';
+                $.ajax({
+                    url:'http://localhost:8083/api/customerbyname/' +getBiodataLastLogin() + '/' + document.getElementById('search').value,
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(customer) {
+                        console.log(customer)
+                        var chat = '';
+                        var janji = '';
+                        for(i=0; i< customer.length; i++) {
+
+                            str += '<tr>';
+                            str += '<td style="width: 50px;"> <br> <input type="checkbox" value = "'+ customer[i].id +'" id="checkboxdelete" name="checkboxdelete" style="height: 17px; width: 17px;background-color: #eee; outline: 1px solid #448dee; box-shadow: 0 0 0 1pt #448dee; border-radius: 5px; left-margin: 10px; right-margin:10px;"> <br> </td>';
+                            str += '<td style="width: auto;"> <p style="font-size:13pt; font-family: Verdana, serif; color: #668cff; padding:0; margin:0;">' + customer[i].fullname + '</p> <p style="font-size:12pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;">' + customer[i].name + ',\t' + customer[i].usia + '\t tahun' + '</p>'
+
+                                    $.ajax({
+                                        url:'http://localhost:8083/api/getchatdata/' + customer[i].id,
+                                        type:'GET',
+                                        async: false,
+                                        contentType: 'application/json',
+                                        success:function(datachat){
+                                            if(datachat.length>0) {
+                                                chat = datachat[0].jumlah_chat
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>'+chat+'</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                            
+                                                        }   
+
+                                                    })
+                                            }
+                                            else {
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>0</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                    
+                                                        }   
+
+                                                    })
+                                            }
+                                        }   
+                                    })
+
+                            str += `<td style="vertical-align: middle; text-align:right;">
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "editForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Ubah </i></button> &ensp;
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "deleteForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-trash" style="font-size:10pt;color:#448dee;">&nbsp; Hapus </i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+                        }
+                        $('#custData').html(str);
+                    }
+                })
+            } 
+            else {
+                loadData()
+            }    
+        }
+
+        function sortCustomerAsc() {
+            var value = $('#sort').val();
+            console.log(value);
+            if(value=="name") {
+                var str = '';
+                $.ajax({
+                    url:'http://localhost:8083/api/customernamesortasc/' +getBiodataLastLogin(),
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(customer) {
+                        console.log(customer)
+                        var chat = '';
+                        var janji = '';
+                        for(i=0; i< customer.length; i++) {
+
+                            str += '<tr>';
+                            str += '<td style="width: 50px;"> <br> <input type="checkbox" value = "'+ customer[i].id +'" id="checkboxdelete" name="checkboxdelete" style="height: 17px; width: 17px;background-color: #eee; outline: 1px solid #448dee; box-shadow: 0 0 0 1pt #448dee; border-radius: 5px; left-margin: 10px; right-margin:10px;"> <br> </td>';
+                            str += '<td style="width: auto;"> <p style="font-size:13pt; font-family: Verdana, serif; color: #668cff; padding:0; margin:0;">' + customer[i].fullname + '</p> <p style="font-size:12pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;">' + customer[i].name + ',\t' + customer[i].usia + '\t tahun' + '</p>'
+
+                                    $.ajax({
+                                        url:'http://localhost:8083/api/getchatdata/' + customer[i].id,
+                                        type:'GET',
+                                        async: false,
+                                        contentType: 'application/json',
+                                        success:function(datachat){
+                                            if(datachat.length>0) {
+                                                chat = datachat[0].jumlah_chat
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>'+chat+'</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                            
+                                                        }   
+
+                                                    })
+                                            }
+                                            else {
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>0</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                    
+                                                        }   
+
+                                                    })
+                                            }
+                                        }   
+                                    })
+
+                            str += `<td style="vertical-align: middle; text-align:right;">
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "editForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Ubah </i></button> &ensp;
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "deleteForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-trash" style="font-size:10pt;color:#448dee;">&nbsp; Hapus </i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+
+                        }
+                        $('#custData').html(str);
+                    }
+                })
+                
+            }
+            else if(value=="age") {
+                var str = '';
+                $.ajax({
+                    url:'http://localhost:8083/api/customeragesortasc/' +getBiodataLastLogin(),
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(customer) {
+                        console.log(customer)
+                        var chat = '';
+                        var janji = '';
+                        for(i=0; i< customer.length; i++) {
+
+                            str += '<tr>';
+                            str += '<td style="width: 50px;"> <br> <input type="checkbox" value = "'+ customer[i].id +'" id="checkboxdelete" name="checkboxdelete" style="height: 17px; width: 17px;background-color: #eee; outline: 1px solid #448dee; box-shadow: 0 0 0 1pt #448dee; border-radius: 5px; left-margin: 10px; right-margin:10px;"> <br> </td>';
+                            str += '<td style="width: auto;"> <p style="font-size:13pt; font-family: Verdana, serif; color: #668cff; padding:0; margin:0;">' + customer[i].fullname + '</p> <p style="font-size:12pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;">' + customer[i].name + ',\t' + customer[i].usia + '\t tahun' + '</p>'
+
+                                    $.ajax({
+                                        url:'http://localhost:8083/api/getchatdata/' + customer[i].id,
+                                        type:'GET',
+                                        async: false,
+                                        contentType: 'application/json',
+                                        success:function(datachat){
+                                            if(datachat.length>0) {
+                                                chat = datachat[0].jumlah_chat
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>'+chat+'</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                            
+                                                        }   
+
+                                                    })
+                                            }
+                                            else {
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>0</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                    
+                                                        }   
+
+                                                    })
+                                            }
+                                        }   
+                                    })
+
+                            str += `<td style="vertical-align: middle; text-align:right;">
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "editForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Ubah </i></button> &ensp;
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "deleteForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-trash" style="font-size:10pt;color:#448dee;">&nbsp; Hapus </i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+
+                        }
+                        $('#custData').html(str);
+                    }
+                })
+                
+            }
+            else {
+                loadData()
+            }
+        }
+
+        function sortCustomerDesc() {
+            var value = $('#sort').val();
+            console.log(value);
+            if(value=="name") {
+                var str = '';
+                $.ajax({
+                    url:'http://localhost:8083/api/customernamesortdesc/' +getBiodataLastLogin(),
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(customer) {
+                        console.log(customer)
+                        var chat = '';
+                        var janji = '';
+                        for(i=0; i< customer.length; i++) {
+
+                            str += '<tr>';
+                            str += '<td style="width: 50px;"> <br> <input type="checkbox" value = "'+ customer[i].id +'" id="checkboxdelete" name="checkboxdelete" style="height: 17px; width: 17px;background-color: #eee; outline: 1px solid #448dee; box-shadow: 0 0 0 1pt #448dee; border-radius: 5px; left-margin: 10px; right-margin:10px;"> <br> </td>';
+                            str += '<td style="width: auto;"> <p style="font-size:13pt; font-family: Verdana, serif; color: #668cff; padding:0; margin:0;">' + customer[i].fullname + '</p> <p style="font-size:12pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;">' + customer[i].name + ',\t' + customer[i].usia + '\t tahun' + '</p>'
+
+                                    $.ajax({
+                                        url:'http://localhost:8083/api/getchatdata/' + customer[i].id,
+                                        type:'GET',
+                                        async: false,
+                                        contentType: 'application/json',
+                                        success:function(datachat){
+                                            if(datachat.length>0) {
+                                                chat = datachat[0].jumlah_chat
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>'+chat+'</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                            
+                                                        }   
+
+                                                    })
+                                            }
+                                            else {
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>0</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                    
+                                                        }   
+
+                                                    })
+                                            }
+                                        }   
+                                    })
+
+                            str += `<td style="vertical-align: middle; text-align:right;">
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "editForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Ubah </i></button> &ensp;
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "deleteForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-trash" style="font-size:10pt;color:#448dee;">&nbsp; Hapus </i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+
+                        }
+                        $('#custData').html(str);
+                    }
+                })
+                
+            }
+            else if(value=="age") {
+                var str = '';
+                $.ajax({
+                    url:'http://localhost:8083/api/customeragesortdesc/' +getBiodataLastLogin(),
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(customer) {
+                        console.log(customer)
+                        var chat = '';
+                        var janji = '';
+                        for(i=0; i< customer.length; i++) {
+
+                            str += '<tr>';
+                            str += '<td style="width: 50px;"> <br> <input type="checkbox" value = "'+ customer[i].id +'" id="checkboxdelete" name="checkboxdelete" style="height: 17px; width: 17px;background-color: #eee; outline: 1px solid #448dee; box-shadow: 0 0 0 1pt #448dee; border-radius: 5px; left-margin: 10px; right-margin:10px;"> <br> </td>';
+                            str += '<td style="width: auto;"> <p style="font-size:13pt; font-family: Verdana, serif; color: #668cff; padding:0; margin:0;">' + customer[i].fullname + '</p> <p style="font-size:12pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;">' + customer[i].name + ',\t' + customer[i].usia + '\t tahun' + '</p>'
+
+                                    $.ajax({
+                                        url:'http://localhost:8083/api/getchatdata/' + customer[i].id,
+                                        type:'GET',
+                                        async: false,
+                                        contentType: 'application/json',
+                                        success:function(datachat){
+                                            if(datachat.length>0) {
+                                                chat = datachat[0].jumlah_chat
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>'+chat+'</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                            
+                                                        }   
+
+                                                    })
+                                            }
+                                            else {
+                                                str += '<p style="font-size:10pt; font-family: Verdana, serif; color: #808080; padding:0; margin:0;"> <h>0</h> Chat online, '
+                                                    $.ajax({
+                                                        url:'http://localhost:8083/api/getappointmentdata/' + customer[i].id,
+                                                        type:'GET',
+                                                        async: false,
+                                                        contentType: 'application/json',
+                                                        success:function(datajanji){
+                                                            if(datajanji.length>0) {
+                                                                janji  = datajanji[0].jumlah_janji;
+                                                                str += '<h>'+janji+'</h> Janji dokter</p>';
+                                                            }
+                                                            else {
+                                                                str += '<h>0</h> Janji dokter</p>';
+                                                            }
+                    
+                                                        }   
+
+                                                    })
+                                            }
+                                        }   
+                                    })
+
+                            str += `<td style="vertical-align: middle; text-align:right;">
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "editForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-pencil" style="font-size:10pt;color:#448dee;">&nbsp; Ubah </i></button> &ensp;
+                                <button class="btn btn-sm" value = "${customer[i].id}" onclick = "deleteForm(this.value)" style="padding: 0; border: none; background: none;"><i class="fa fa-trash" style="font-size:10pt;color:#448dee;">&nbsp; Hapus </i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+
+                        }
+                        $('#custData').html(str);
+                    }
+                })
+                
+            }
+            else {
+                loadData()
+            }
+        }
+
+        function addForm() {
+            str = `
+            <table>
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Nama Lengkap*</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="text" id = "fullname" maxlength="255" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"> <br>
+                        <span style="color: red; font-size: 10pt;" id="validationName"></span>
+                    </td> 
+                <tr>
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Tanggal Lahir*</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </div>
+                            <input id="dob" type="date" class="form-control datepicker" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"> <br>
+                            <span style="color: red; font-size: 10pt;" id="validationDob"></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="height: 60px;">
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">
+                        Jenis Kelamin*<br>
+                        <span style="color: red; font-size: 10pt;" id="validationGender"></span>
+                    </td> 
+                    <td>
+                        <input type="radio" id="gender1" name="gender" value="M" style="font-family: Calibri, serif;"> Laki-laki </input> &emsp;
+                        <input type="radio" id="gender2" name="gender" value="F" style="font-family: Calibri, serif;"> Perempuan </input>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Golongan Darah</td>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Rhesus</td>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="bloodType" name="bloodtype" style="height: 40px; width: 75%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></select>
+                    </td>
+                    <td>
+                        <input type="radio" id="rhesus_type" name="rhesus" value="plus" style="font-family: Calibri, serif;"> Rh + </input> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                        <input type="radio" id="rhesus_type" name="rhesus" value="mins" style="font-family: Calibri, serif;"> Rh - </input>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Tinggi Badan</td>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Berat Badan</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" id="height" style="height: 40px; width: 75%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></input> &nbsp; cm
+                    </td>
+                    <td>
+                        <input type="number" id="weight" style="height: 40px; width: 75%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></input> &nbsp; kg
+                    </td>                    
+                </tr>
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Relasi*</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <select id="custRelation" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></select> <br>
+                        <span style="color: red; font-size: 10pt;" id="validationRelation"></span>
+                    </td>
+                </tr>
+            </table> `;
+            btn = `
+                <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="validateAdd()">Simpan</button>
+            `;
+            
+            $('#mymodal').modal('show');
+            $('.modal-title').html('<p style="font-weight: bold;font-size:20pt; color:#668cff;">Tambah Pasien<p>');
+            $('.modal-body').html(str);
+            $('.modal-footer').html(btn);
+
+            getBloodType()
+            getCustRelation() 
+
+        }
+
+        function getBloodType(id,code) {
+            if(id==undefined) {
+                id = 0
+                code = '---Pilih---'
+            }
+            $.ajax({
+                url:'http://localhost:8083/api/bloodtype',
+                type:'GET',
+                contentType: 'application/json',
+                success:function(bloodtype) {
+                    console.log(bloodtype)
+                    var str = '<option value="'+id+'" selected>'+code+'</option>';
+                    for(i=0; i< bloodtype.length; i++) {
+                        str += '<option value="'+bloodtype[i].id+'selected">'+bloodtype[i].code+'</option>';
+                    }
+                    $('#bloodType').html(str);
+                }
+            })
+        }
+
+        function getCustRelation(id,name) {
+            if(id==undefined) {
+                id = 0
+                name = '---Pilih---'
+            }
+            $.ajax({
+                url:'http://localhost:8083/api/custrelation',
+                type:'GET',
+                contentType: 'application/json',
+                success:function(custrelation) {
+                    console.log(custrelation)
+                    var str = '<option value="'+id+'" selected>'+name+'</option>';
+                    for(i=0; i< custrelation.length; i++) {
+                        str += '<option value="'+custrelation[i].id+' selected">'+custrelation[i].name+'</option>';
+                    }
+                    $('#custRelation').html(str);
+                }
+            })
+        }
+
+        function validateAdd() {
+            var fullname = $('#fullname').val()
+            var dob = $('#dob').val()
+            // var gender = $('#gender').val()
+            var relation = $('#custRelation').val()
+            var gender1 = document.getElementById('gender1')
+            var gender2 = document.getElementById('gender2')
+            if(fullname.length == 0) {
+                $('#validationName').html('*Nama lengkap harus diisi') 
+            }
+            if(dob.length == 0) {
+                $('#validationDob').html('*Tanggal lahir harus diisi') 
+            }
+            if(gender1.checked == false && gender2.checked == false) {
+                $('#validationGender').html('*Jenis kelamin harus diisi') 
+            }
+            if(relation == null) {
+                $('#validationRelation').html('*Hubungan keluarga harus diisi')
+            } 
+            else {
+                saveAll()
+            }  
+        }
+
+
+        function saveAll() {
+
+            const biodata = {
+                fullName : $('#fullname').val(),
+                createdOn : new Date().toISOString()
+            }
+
+            $.ajax({
+                url:'http://localhost:8083/api/biodata',
+                type:'POST',
+                dataType:'json',
+                data:JSON.stringify(biodata),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+
+                    var gender1 = document.getElementById('gender1')
+                    var gender2 = document.getElementById('gender2')
+                    var gen = ""
+                    
+                    if(gender1.checked==true) {
+                        gen = "M"
+                    }
+                    if(gender2.checked==true) {
+                        gen = "F"
+                    }
+                    const customerData = {
+                        dob : $('#dob').val(),
+                        gender : gen,
+                        weight : $('#weight').val(),
+                        height : $('#height').val(),
+                        bloodGroupId : parseInt($('#bloodType').val()),
+                        rhesusType : $('#rhesus_type').val(),
+                        biodataId : result.id,
+                        createdOn : new Date().toISOString(),
+                    }
+
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/customer',
+                        type:'POST',
+                        dataType:'json',
+                        data:JSON.stringify(customerData),
+                        contentType:'application/json',
+                        success:function(customer) {
+                            console.log(customer)
+                            $('#mymodal').modal('hide')
+
+                            const custMemberData = {
+                                parentBiodataId : parseInt(getBiodataLastLogin()),
+                                customerId : customer.id,
+                                customerRelationId : parseInt($('#custRelation').val()),
+                                createdOn : new Date().toISOString()
+                            }
+
+                            $.ajax({
+                                url:'http://localhost:8083/api/custmember',
+                                type:'POST',
+                                dataType:'json',
+                                data:JSON.stringify(custMemberData),
+                                contentType:'application/json',
+                                success:function(result) {
+                                    console.log(result)
+                                    $('#mymodal').modal('hide')
+
+                                    loadData()
+                                }
+                            })
+
+                        }
+                    })
+                }   
+            })
+
+        }
+
+        function editForm(customer_id) {  
+            console.log(customer_id)
+            $.ajax({
+                url:'http://localhost:8083/api/customer/' + getBiodataLastLogin() + '/' + customer_id,
+                type:'GET',
+                contentType: 'application/json',
+                success:function(customer) {
+                    console.log(customer)
+                    str = `
+                    <table>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Nama Lengkap*</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="text" id = "fullname" maxlength="255" value="${customer[0].fullname}" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"> <br>
+                                <span style="color: red; font-size: 10pt;" id="validationName"></span>
+                                <input type="hidden" id = "mb_created_on" value="${customer[0].mbcreated_on}">
+                                <input type="hidden" id = "mc_created_on" value="${customer[0].mccreated_on}">
+                                <input type="hidden" id = "mcm_created_on" value="${customer[0].mcmcreated_on}">
+                                <input type="hidden" id = "biodata_id" value="${customer[0].biodata_id}">
+                                <input type="hidden" id = "custmember_id" value="${customer[0].custmember_id}">
+                                <input type="hidden" id = "mb_created_by" value="${customer[0].mbcreated_by}">
+                                <input type="hidden" id = "mc_created_by" value="${customer[0].mccreated_by}">
+                                <input type="hidden" id = "mcm_created_by" value="${customer[0].mcmcreated_by}">
+                                <input type="hidden" id = "customer_id" value="${customer[0].id}">
+                                <input type="hidden" id = "mobile_phone" value="${customer[0].mobile_phone}">
+                                <input type="hidden" id = "parent_biodata_id" value="${customer[0].parent_biodata_id}">
+                            </td> 
+                        <tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Tanggal Lahir*</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <span class="glyphicon glyphicon-th"></span>
+                                    </div>
+                                    <input id="dob" type="date" class="datepicker" value="${customer[0].dob}" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"> <br>
+                                <span style="color: red; font-size: 10pt;" id="validationDob"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="height: 60px;">
+                            <td tyle="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">
+                                Jenis Kelamin* <br>
+                                <span style="color: red; font-size: 10pt;" id="validationGender"></span>
+                            </td>
+                            <td>
+                                <input type="radio" id="gender1" name="gender" value="M" onclick="updateGender()" style="font-family: Calibri, serif;"> Laki-laki </input> &emsp;
+                                <input type="radio" id="gender2" name="gender" value="F" onclick="updateGender()" style="font-family: Calibri, serif;"> Perempuan </input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Golongan Darah</td>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Rhesus</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select id="bloodType" name="bloodtype" value="${customer[0].blood_group_id}" style="height: 40px; width: 75%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></select>
+                            </td>
+                            <td>
+                                <input type="radio" id="rhesus_type1" name="rhesus" value="plus" onclick="updateRhesus()" style="font-family: Calibri, serif;"> Rh + </input> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                <input type="radio" id="rhesus_type2" name="rhesus" value="mins" onclick="updateRhesus()" style="font-family: Calibri, serif;"> Rh - </input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Tinggi Badan</td>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Berat Badan</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="number" id="height" value="${customer[0].height}" style="height: 40px; width: 75%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></input> &nbsp; cm
+                            </td>
+                            <td>
+                                <input type="number" id="weight" value="${customer[0].weight}" style="height: 40px; width: 75%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></input> &nbsp; kg
+                            </td>                            
+                        </tr>
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Relasi*</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <select id="custRelation" value="${customer[0].customer_relation_id}" style="height: 40px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif;"></select> <br>
+                                <span style="color: red; font-size: 10pt;" id="validationRelation"></span>
+                            </td>
+                        </tr>
+                    </table> `;
+                    btn = `
+                        <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                        <button type="button" class="btn btn-primary" value="${customer[0].id}" onclick="validateEdit(this.value)">Simpan</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('<p style="font-weight: bold; font-size:20pt; color:#668cff;">Edit Pasien<p>');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+
+                    getBloodType(customer[0].blood_group_id,customer[0].code)
+                    getCustRelation(customer[0].customer_relation_id,customer[0].name)
+       
+
+                    if(customer[0].gender=="M") {
+                        document.getElementById('gender1').checked = true
+                        document.getElementById('gender2').checked = false
+                    }
+                    else {
+                        document.getElementById('gender2').checked = true
+                        document.getElementById('gender1').checked = false
+                    }
+
+                    if(customer[0].rhesus_type=="plus") {
+                        document.getElementById('rhesus_type1').checked = true
+                        document.getElementById('rhesus_type2').checked = false
+                    }
+                    else {
+                        document.getElementById('rhesus_type2').checked = true
+                        document.getElementById('rhesus_type1').checked = false
+                    }
+
+                }
+            })       
+        }
+
+
+        function validateEdit(id) {
+            var fullname = $('#fullname').val()
+            var dob = $('#dob').val()
+            var relation = $('#custRelation').val()
+            if(fullname.length == 0) {
+                $('#validationName').html('*Nama lengkap harus diisi') 
+            }
+            if(dob.length == 0) {
+                $('#validationDob').html('*Tanggal lahir harus diisi') 
+            }
+            if(relation == null) {
+                $('#validationRelation').html('*Hubungan keluarga harus diisi')
+            } 
+            else {
+                editCustomer(id)
+            }  
+        }
+        
+
+        function updateGender() {
+            var genderRadios = document.getElementsByName("gender");
+            var selectedGender;
+            for (var i = 0; i < genderRadios.length; i++) {
+                if (genderRadios[i].checked) {
+                    selectedGender = genderRadios[i].value;
+                    break;
+                }
+            }
+            console.log("Selected gender: " + selectedGender);
+            return selectedGender
+        }
+
+        function updateRhesus() {
+            var rhesusRadios = document.getElementsByName("rhesus");
+            var selectedRhesus;
+            for (var i = 0; i < rhesusRadios.length; i++) {
+                if (rhesusRadios[i].checked) {
+                    selectedRhesus = rhesusRadios[i].value;
+                    break;
+                }
+            }
+            console.log("Selected rhesus: " + selectedRhesus);
+            return selectedRhesus
+        }
+
+
+        function editCustomer(customer_id) {
+
+            const customerData = {
+                dob : $('#dob').val(),
+                gender : updateGender(),
+                weight : $('#weight').val(),
+                height : $('#height').val(),
+                bloodGroupId : parseInt($('#bloodType').val()),
+                rhesusType : updateRhesus(),
+                createdBy : $('#mc_created_by').val(),
+                createdOn : $('#mc_created_on').val(),
+                biodataId : $('#biodata_id').val(),
+                modifiedOn : new Date().toISOString()
+            }
+
+            console.log(customerData)
+
+            $.ajax({
+                url:'http://localhost:8083/api/customer/'+ customer_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(customerData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+
+                    const biodataData = {
+                        fullName : $('#fullname').val(),
+                        mobilePhone : $('#mobile_phone').val(),
+                        createdBy : $('#mb_created_by').val(),
+                        createdOn : $('#mb_created_on').val(),
+                        modifiedOn : new Date().toISOString()
+                    }
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/biodata/' + $('#biodata_id').val(),
+                        type:'PUT',
+                        dataType:'json',
+                        data:JSON.stringify(biodataData),
+                        contentType:'application/json',
+                        success:function(biodata) {
+                            console.log(biodata)
+                            $('#mymodal').modal('hide')
+
+                        }
+                    })
+
+                    const custMemberData = {
+                        customerRelationId : parseInt($('#custRelation').val()),
+                        customerId : parseInt($('#customer_id').val()),
+                        createdBy : $('#mcm_created_by').val(),
+                        createdOn : $('#mcm_created_on').val(),
+                        modifiedOn : new Date().toISOString(),
+                        parentBiodataId : $('#parent_biodata_id').val()
+                    }
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/custmember/' + $('#custmember_id').val(),
+                        type:'PUT',
+                        dataType:'json',
+                        data:JSON.stringify(custMemberData),
+                        contentType:'application/json',
+                        success:function(custmember) {
+                            console.log(custmember)
+                            $('#mymodal').modal('hide')
+                            loadData();
+                        }
+                    })
+                }
+            })
+
+        }
+
+        function deleteForm(customer_id) {  
+            console.log(customer_id)
+            $.ajax({
+                url:'http://localhost:8083/api/customer/' + getBiodataLastLogin() + '/' + customer_id,
+                type:'GET',
+                contentType: 'application/json',
+                success:function(customer) {
+                    console.log(customer)
+                    str = '';
+                    btn = '';
+                    for(i=0; i< customer.length; i++) {
+                        str += '<table>';
+                        str += '<tr> ' ;
+                        str += '<p style="font-size:13pt; font-family: Calibri, serif;">Apakah Anda yakin ingin menghapus pasien</p>';
+                        str += '<p style="font-size:14pt; font-family: Verdana, serif; font-weight: bold; serif; color: #668cff;">'+customer[i].fullname+'</p>';
+                        str += '<p style="font-size:13pt; font-family: Calibri, serif;">Riwayat medis pasien akan tetap tersimpan, tetapi Anda tidak dapat lagi untuk membuat janji dokter atau chat online untuk pasien ini.</p>';
+                        str += '<input type="hidden" id = "fullname" value="'+customer[i].fullname+'">';
+                        str += '<input type="hidden" id = "biodata_id" value="'+customer[i].biodata_id+'">';
+                        str += '<input type="hidden" id = "custmember_id" value="'+customer[i].custmember_id+'">';
+                        str += '<input type="hidden" id = "mb_created_on" value="'+customer[i].mbcreated_on+'">';
+                        str += '<input type="hidden" id = "mc_created_on" value="'+customer[i].mccreated_on+'">';
+                        str += '<input type="hidden" id = "mcm_created_on" value="'+customer[i].mcmcreated_on+'">';
+                        str += '<input type="hidden" id = "mb_created_by" value="'+customer[i].mbcreated_by+'">';
+                        str += '<input type="hidden" id = "mc_created_by" value="'+customer[i].mccreated_by+'">';
+                        str += '<input type="hidden" id = "mcm_created_by" value="'+customer[i].mcmcreated_by+'">';
+                        str += '<input type="hidden" id = "mb_modified_on" value="'+customer[i].mbmodified_on+'">';
+                        str += '<input type="hidden" id = "mc_modified_on" value="'+customer[i].mcmodified_on+'">';
+                        str += '<input type="hidden" id = "mcm_modified_on" value="'+customer[i].mcmcreated_on+'">';
+                        str += '<input type="hidden" id = "mb_modified_by" value="'+customer[i].mbmodified_by+'">';
+                        str += '<input type="hidden" id = "mc_modified_by" value="'+customer[i].mcmodified_by+'">';
+                        str += '<input type="hidden" id = "mcm_modified_by" value="'+customer[i].mcmmodified_by+'">';
+                        str += '<input type="hidden" id = "parent_biodata_id" value="'+customer[0].parent_biodata_id+'">';
+                        str += '<input type="hidden" id = "customer_id" value="'+customer[i].id+'">';
+                        str += '<input type="hidden" id = "gender" value="'+customer[i].gender+'">';
+                        str += '<input type="hidden" id = "height" value="'+customer[i].height+'">';
+                        str += '<input type="hidden" id = "weight" value="'+customer[i].weight+'">';
+                        str += '<input type="hidden" id = "bloodType" value="'+customer[i].code+'">';
+                        str += '<input type="hidden" id = "dob" value="'+customer[i].dob+'">';
+                        str += '<input type="hidden" id = "custRelation" value="'+customer[i].name+'">';
+                        str += '<input type="hidden" id = "rhesus_type" value="'+customer[i].rhesus_type+'">';
+                        str += '</tr>';
+                        str += '</table>';
+                        btn += '<button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>';
+                        btn += '<button type="button" class="btn btn-danger" value="'+customer[i].id+'" onclick="deleteCustomer(this.value)">Hapus</button>';
+                    }
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('<p style="font-weight: bold;font-size:20pt; color:#668cff;">Hapus Pasien<p>');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+
+                    getBloodType()
+                    getCustRelation()
+
+                }
+            })       
+        }
+
+        function deleteCustomer(customer_id) {
+
+            const customerData = {
+                dob : $('#dob').val(),
+                gender : $('#gender').val(),
+                weight : $('#weight').val(),
+                height : $('#height').val(),
+                bloodGroupId : parseInt($('#bloodType').val()),
+                rhesusType : $('#rhesus_type').val(),
+                // createdBy : $('#mc_created_by').val(),
+                createdOn : $('#mc_created_on').val(),
+                modifiedOn : $('#mc_modified_on').val(),
+                biodataId : $('#biodata_id').val(),
+                modifiedOn : $('#mc_modified_on').val(),
+                deletedOn : new Date().toISOString(),
+                isDelete : true
+            }
+
+            console.log(customerData)
+
+            $.ajax({
+                url:'http://localhost:8083/api/customer/'+ customer_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(customerData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+
+                    const biodataData = {
+                        fullName : $('#fullname').val(),
+                        // createdBy : $('#mb_created_by').val(),
+                        createdOn : $('#mb_created_on').val(),
+                        modifiedOn : $('#mb_modified_on').val(),
+                        deletedOn : new Date().toISOString(),
+                        isDelete : true
+                    }
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/biodata/' + $('#biodata_id').val(),
+                        type:'PUT',
+                        dataType:'json',
+                        data:JSON.stringify(biodataData),
+                        contentType:'application/json',
+                        success:function(biodata) {
+                            console.log(biodata)
+                            $('#mymodal').modal('hide')
+
+                            
+
+                        }
+                    })
+
+                    const custMemberData = {
+                        customerRelationId : parseInt($('#custRelation').val()),
+                        // createdBy : $('#mcm_created_by').val(),
+                        createdOn : $('#mcm_created_on').val(),
+                        modifiedOn : $('#mcm_modified_on').val(),
+                        deletedOn : new Date().toISOString(),
+                        parentBiodataId : $('#parent_biodata_id').val(),
+                        isDelete : true
+                    }
+
+                    $.ajax({
+                        url:'http://localhost:8083/api/custmember/' + $('#custmember_id').val(),
+                        type:'PUT',
+                        dataType:'json',
+                        data:JSON.stringify(custMemberData),
+                        contentType:'application/json',
+                        success:function(custmember) {
+                            console.log(custmember)
+                            $('#mymodal').modal('hide')
+                            loadData();
+                        }
+                    })
+                }
+            })
+
+        }
+
+        // Multiple delete 
+        $(document).ready(function() {
+            $('#multipledelete').click(function() {
+                var selectedRow = new Array();
+                $('input[name="checkboxdelete"]:checked').each(function() {
+                    selectedRow.push(this.value);
+                });
+                console.log("Number of selected Value: " + selectedRow.length + "\n" + "And, they are: " + selectedRow);
+                for(i=0;i<selectedRow.length;i++) {
+                    multipleDelete(selectedRow)
+                }
+            });
+        });
+
+
+        function multipleDelete(selectedRow) {
+            var arrayId = selectedRow;
+                    btn = '';
+                    str = `<table> 
+                            <tr>
+                            <p style="font-size:13pt; font-family: Calibri, serif;">Apakah Anda yakin ingin menghapus pasien</p>
+                            `;
+                    tombol = '';
+                for(i=0;i<arrayId.length;i++) {
+                            $.ajax({
+                                url:'http://localhost:8083/api/customer/'+ arrayId[i],
+                                type:'GET',
+                                contentType: 'application/json',
+                                async: false,
+                                success:function(customer) {
+                                console.log(customer[0].fullname)
+                                    str += '<p style="font-size:14pt; font-family: Verdana, serif; font-weight: bold; serif; color: #668cff;">'+customer[0].fullname+'</p>';
+                                    str += '<input type="hidden" id = "fullname" value="'+customer[0].fullname+'">';
+                                    str += '<input type="hidden" id = "biodata_id" value="'+customer[0].biodata_id+'">';
+                                    str += '<input type="hidden" id = "custmember_id" value="'+customer[0].custmember_id+'">';
+                                    str += '<input type="hidden" id = "mb_created_on" value="'+customer[0].mbcreated_on+'">';
+                                    str += '<input type="hidden" id = "mc_created_on" value="'+customer[0].mccreated_on+'">';
+                                    str += '<input type="hidden" id = "mcm_created_on" value="'+customer[0].mcmcreated_on+'">';
+                                    str += '<input type="hidden" id = "mb_created_by" value="'+customer[0].mbcreated_by+'">';
+                                    str += '<input type="hidden" id = "mc_created_by" value="'+customer[0].mccreated_by+'">';
+                                    str += '<input type="hidden" id = "mcm_created_by" value="'+customer[0].mcmcreated_by+'">';
+                                    str += '<input type="hidden" id = "mb_modified_on" value="'+customer[0].mbmodified_on+'">';
+                                    str += '<input type="hidden" id = "mc_modified_on" value="'+customer[0].mcmodified_on+'">';
+                                    str += '<input type="hidden" id = "mcm_modified_on" value="'+customer[0].mcmcreated_on+'">';
+                                    str += '<input type="hidden" id = "mb_modified_by" value="'+customer[0].mbmodified_by+'">';
+                                    str += '<input type="hidden" id = "mc_modified_by" value="'+customer[0].mcmodified_by+'">';
+                                    str += '<input type="hidden" id = "mcm_modified_by" value="'+customer[0].mcmmodified_by+'">';
+                                    str += '<input type="hidden" id = "customer_id" value="'+customer[0].id+'">';
+                                    str += '<input type="hidden" id = "gender" value="'+customer[0].gender+'">';
+                                    str += '<input type="hidden" id = "height" value="'+customer[0].height+'">';
+                                    str += '<input type="hidden" id = "weight" value="'+customer[0].weight+'">';
+                                    str += '<input type="hidden" id = "bloodType" value="'+customer[0].code+'">';
+                                    str += '<input type="hidden" id = "dob" value="'+customer[0].dob+'">';
+                                    str += '<input type="hidden" id = "custRelation" value="'+customer[0].name+'">';
+                                    str += '<input type="hidden" id = "rhesus_type" value="'+customer[0].rhesus_type+'">';
+                                }
+                            })
+
+
+                }
+                str += '<p style="font-size:13pt; font-family: Calibri, serif;">Riwayat medis pasien akan tetap tersimpan, tetapi Anda tidak dapat lagi untuk membuat janji dokter atau chat online untuk pasien ini.</p>';
+                str += '</tr>';
+                str += '</table>';
+                btn += '<button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>';
+                for(j=0;j<arrayId.length;j++) {
+                    $.ajax({
+                        url:'http://localhost:8083/api/customer/'+ arrayId[j],
+                        type:'GET',
+                        contentType: 'application/json',
+                        async: false,
+                        success:function(customer) {
+                            tombol = deleteCustomer(customer[0].id);
+                        }
+                    })
+                }                
+                btn += '<button type="button" class="btn btn-danger" onclick="'+tombol+'">Hapus</button>';
+
+
+                $('#mymodal').modal('show');
+                $('.modal-title').html('<p style="font-weight: bold;font-size:20pt; color:#668cff;">Hapus Pasien<p>');
+                $('.modal-body').html(str);
+                $('.modal-footer').html(btn);
+    }
+
+        function closeButton() {
+            $('#mymodal').modal('hide')
+            loadData()
+        }
+
+        $('.datepicker').datepicker({
+            format: 'yyyy-MM-dd',
+        });
+
+        function extractYear() {
+            $.ajax({
+                url:'http://localhost:8083/api/extractyear/'+ getUserLastLogin(),
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(customer){
+                    data = customer[0].tahun_join;
+                    $('#dataTahun').html(data);
+                    console.log(customer[0].tahun_join)
+                }   
+
+            })
+        }
+
+
+        extractYear()
+
+    </script>
+
+</div>
+
+</body>
+</html>

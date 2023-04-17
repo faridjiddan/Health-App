@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Golongan Darah</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <h3 align="center">Daftar Golongan Darah</h3>
+    <div class="container">
+        <div class="row">
+            <div class="col-10">
+                <input class="form-control" type="search" style="width: 30%;" placeholder="Cari berdasarkan kode" aria-label="Search" id="searchbloodtype" oninput="search(this.value)">
+            </div>
+            <div class="col-2">
+                <button onclick="addForm()" style="float:right;" class="btn btn-primary"><i class="fa fa-plus"></i></button>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th width="50px" style="text-align: center;">Kode</th>
+                        <th style="text-align: center;" width="40%">Deskripsi</th>
+                        <th style="text-align: center;">Diubah oleh</th>
+                        <th width="100px" style="text-align: center;">Tindakan</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bloodTypeData">
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+        loadBloodType();
+        function loadBloodType() {
+            $.ajax({
+            url:'http://localhost:8083/api/bloodtype',
+            type:'GET',
+            contentType: 'application/json',
+            success:function(bloodtype) {
+                console.log(bloodtype) 
+                var str = '';
+                for(i=0; i< bloodtype.length; i++) {
+                    console.log(bloodtype[i])
+                    
+                    var name = ''
+                    if(bloodtype[i].fullname == null) {
+                        name = '';
+                    }
+                    else{
+                        name = bloodtype[i].fullname;
+                    }
+
+                    str += '<tr>';
+                    str += '<td style="text-align: center;">' + bloodtype[i].code + '</td>';
+                    str += '<td style="text-align: center;">' + bloodtype[i].description + '</td>';  
+                    str += '<td style="text-align: center;">' + name + '</td>';
+                    str += `<td style="text-align: center;">
+                        <button class="btn btn-warning" value ="${bloodtype[i].id}" onclick = "editForm(this.value)"><i class="fa fa-pencil"></i></button>
+                        <button class="btn btn-danger" value ="${bloodtype[i].id}" onclick = "deleteForm(this.value)"><i class="fa fa-trash"></i></button>
+                    </td>`;                                                          
+                    str += '</tr>';
+                }
+                $('#bloodTypeData').html(str);
+                
+                
+            }
+            })   
+        }
+
+        function search(code) {
+            if (code) {
+                $.ajax({
+                    url:'http://localhost:8083/api/bloodtypebycode/' + code,
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(bloodtype) {
+                        console.log(bloodtype)
+                        var str = '';
+                        for(i=0; i< bloodtype.length; i++) {
+                            console.log(bloodtype[i])
+                            
+                            var name = ''
+                            if(bloodtype[i].fullname == null) {
+                                name = '';
+                            }
+                            else{
+                                name = bloodtype[i].fullname;
+                            }
+
+                            str += '<tr>';
+                            str += '<td style="text-align: center;">' + bloodtype[i].code + '</td>';
+                            str += '<td style="text-align: center;">' + bloodtype[i].description + '</td>';  
+                            str += '<td style="text-align: center;">' + name + '</td>';
+                            str += `<td style="text-align: center;">
+                                <button class="btn btn-warning" value ="${bloodtype[i].id}" onclick = "editForm(this.value)"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger" value ="${bloodtype[i].id}" onclick = "deleteForm(this.value)"><i class="fa fa-trash"></i></button>
+                            </td>`;                                                          
+                            str += '</tr>';
+                        }
+                        $('#bloodTypeData').html(str)
+                    }
+                })
+            } 
+            else {
+                loadBloodType()
+            }    
+        }
+
+        function addForm() {
+            str = `
+            <table style="width:100%">
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Kode*</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="text" id = "code" maxlength="5" style="height: 35px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;"> <br>
+                        <span style="color: red; font-size: 10pt;" id="validation"></span>
+                    </td> 
+                <tr>
+                    <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Deskripsi</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="text" id = "description" maxlength="255" style="height: 35px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;"> <br>
+                        <span style="color: red; font-size: 10pt;" id="validation"></span>
+                    </td> 
+                <tr>
+            </table> `;
+            btn = `
+                <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="validateAdd()">Simpan</button>
+            `;
+            
+            $('#mymodal').modal('show');
+            $('.modal-title').html('Tambah Golongan Darah');
+            $('.modal-body').html(str);
+            $('.modal-footer').html(btn);
+
+        }
+
+        function validateAdd() {
+            var code = $('#code').val()
+            if(code.length == 0) {
+                $('#validation').html('*Kode harus diisi')
+            } 
+            else {
+                $.ajax({
+                    url:'http://localhost:8083/api/validationcode/' + code,
+                    type:'GET',
+                    contentType: 'application/json',
+                    success:function(bloodtype) {
+                        var count = 0;
+                        for(i=0;i<bloodtype.length;i++) {
+
+                            if(code == bloodtype[i].code) {
+                                console.log("++++++++++++++++++++++")
+                                $('#validation').html('*Kode yang Anda masukkan sudah ada');
+                                count++;
+                            }
+                        }
+
+                        if(count==0) {
+                            console.log("=====================")
+                            saveBloodType()
+                        }
+                    }
+                })
+                
+            }  
+        }
+
+        function saveBloodType() {
+
+            const bloodTypeData = {
+                createdBy : parseInt(getUserLastLogin()),
+                code : $('#code').val(),
+                description : $('#description').val(),
+                createdOn : new Date().toISOString()
+            }
+            console.log("))))))))))))))))))))")
+
+            console.log(bloodTypeData)
+
+            $.ajax({
+                url:'http://localhost:8083/api/bloodtype',
+                type:'POST',
+                dataType:'json',
+                data:JSON.stringify(bloodTypeData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log("((((((((((()))))))))))")
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+                    loadBloodType()
+                }
+            })
+        }
+
+        function editForm(bloodtype_id) {
+            $.ajax({
+                url:'http://localhost:8083/api/bloodtype/' + bloodtype_id,
+                type: 'GET',
+                contentType:'application/json',
+                success:function(bloodtype) {
+                    // console.log(bloodtype.code)
+                    str = `
+                    <table style="width:100%">
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Kode*</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="text" id = "code" maxlength="5" value="${bloodtype.code}" style="height: 35px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;"> <br>
+                                <span style="color: red; font-size: 10pt;" id="validation"></span>
+                                <input type="hidden" id = "created_on" value="${bloodtype.createdOn}">
+                                <input type="hidden" id = "created_by" value="${bloodtype.createdBy}">
+                            </td> 
+                        <tr>
+                            <td style="font-size:11pt; font-family: 'Trebuchet MS', serif; color: #808080;">Deskripsi</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="text" id = "description" value="${bloodtype.description}" maxlength="255" style="height: 35px; width: 100%; border-radius: 5px; border: 1px solid #668cff; font-size:14pt; font-family: Calibri, serif; padding-left:10px;"> <br>
+                                <span style="color: red; font-size: 10pt;" id="validation"></span>
+                            </td> 
+                        <tr>
+                    </table>
+                    `;
+                    btn = `
+                    <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                    <button type="button" class="btn btn-primary" value="${bloodtype.id}" onclick="validateEdit(this.value)">Simpan</button>
+                    `;
+                    
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Edit Golongan Darah');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+
+                }
+
+            })
+        }
+
+        function validateEdit(id) {
+            var code = $('#code').val()
+            if(code.length == 0) {
+                $('#validation').html('*Kode harus diisi')
+            } 
+            else {
+                $.ajax({
+                    url:'http://localhost:8083/api/validationcode/' + code,
+                    type:'GET',
+                    contentType: 'application/json',
+                    success:function(bloodtype) {
+                        var count = 0;
+                        for(i=0;i<bloodtype.length;i++) {
+
+                            if(code == bloodtype[i].code) {
+                                console.log("++++++++++++++++++++++")
+                                $('#validation').html('*Kode yang Anda masukkan sudah ada');
+                                count++;
+                            }
+                        }
+
+                        if(count==0) {
+                            console.log("=====================")
+                            editBloodType(id)
+                        }
+                    }
+                })
+                
+            }
+        }
+
+        function editBloodType(bloodtype_id) {
+
+            const bloodTypeData = {
+                code : $('#code').val(),
+                description : $('#description').val(),
+                modifiedBy : parseInt(getUserLastLogin()),
+                modifiedOn : new Date().toISOString(),
+                createdBy : $('#created_by').val(),
+                createdOn : $('#created_on').val()
+            }
+
+            $.ajax({
+                url:'http://localhost:8083/api/bloodtype/'+ bloodtype_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(bloodTypeData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+                    loadBloodType()
+                }
+            })
+        }
+
+
+        function deleteForm(bloodtype_id) {
+
+            $.ajax({
+                url:'http://localhost:8083/api/bloodtype/' + bloodtype_id,
+                type: 'GET',
+                contentType:'application/json',
+                success:function(bloodtype) {
+                    str = `
+                    <table style="width:100%;">
+                         <tr>
+                            <td>
+                                <p style="font-size:13pt; font-family: Calibri, serif;">Apakah Anda yakin ingin menghapus golongan darah ${bloodtype.code}?</p>
+                                <input type="hidden" id = "code" maxlength="5" value="${bloodtype.code}">
+                                <input type="hidden" id = "created_on" value="${bloodtype.createdOn}">
+                                <input type="hidden" id = "modified_on" value="${bloodtype.modifiedOn}">
+                                <input type="hidden" id = "created_by" value="${bloodtype.createdBy}">
+                                <input type="hidden" id = "modified_by" value="${bloodtype.modifiedBy}">
+                                <input type="hidden" id = "description" maxlength="255" value="${bloodtype.description}">
+                            </td>
+                        </tr>
+                    </table> `;
+                    btn = `
+                    <button type="button" class="btn btn-secondary" onclick="closeButton()">Batal</button>
+                    <button type="button" class="btn btn-danger" value = "${bloodtype.id}" onclick ="deleteBloodType(this.value)">Hapus</button>
+                    `;
+
+                    $('#mymodal').modal('show');
+                    $('.modal-title').html('Hapus Golongan Darah');
+                    $('.modal-body').html(str);
+                    $('.modal-footer').html(btn);
+                }
+            })
+        }
+
+        function deleteBloodType(bloodtype_id) {
+
+            const bloodTypeData = {
+                code : $('#code').val(),
+                description : $('#description').val(),
+                deletedBy : parseInt(getUserLastLogin()),
+                deletedOn : new Date().toISOString(),
+                modifiedOn : $('#modified_on').val(),
+                createdOn : $('#created_on').val(),
+                createdBy : $('#created_by').val(),
+                modifiedBy : $('#modified_by').val(),
+                isDelete : true
+            }
+
+            $.ajax({
+                url:'http://localhost:8083/api/bloodtype/'+ bloodtype_id,
+                type:'PUT',
+                dataType:'json',
+                data:JSON.stringify(bloodTypeData),
+                contentType:'application/json',
+                success:function(result) {
+                    console.log(result)
+                    $('#mymodal').modal('hide')
+                    loadBloodType()
+                }
+            })
+
+        }
+
+        function closeButton() {
+            $('#mymodal').modal('hide')
+            loadBloodType()
+        }
+
+        function getUserLastLogin() {
+            $.ajax({
+                url:'http://localhost:8083/api/userlastlogin',
+                type:'GET',
+                async: false,
+                contentType: 'application/json',
+                success:function(user){
+                    value = user[0].id;
+                }
+            })
+            return value;
+        }
+        
+
+    </script>
+
+</div>
+
+</body>
+</html>

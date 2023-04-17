@@ -1,0 +1,306 @@
+<!Doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/" 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Landing Page</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"></link>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"></link>
+    <link rel="stylesheet" href="/css/customrole.css"></link>
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"></link> -->
+
+    <script src="/js/jquery-3.6.3.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/custom.js"></script>
+    <!-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script> -->
+
+</head>
+<body>
+
+<!-- Modal Cari Dokter -->
+<div class="modal fade" id="mymodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p style="text-align:center; color:grey;">Masukkan minimal 1 kata kunci untuk pencarian dokter Anda</p>
+            <table class="table">
+                <tr>
+                    <td colspan="2"><small style="color:grey;">Lokasi</small>
+                        <select id="locationId" class="form-select"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><small style="color:grey;">Nama Dokter</small><br>
+                        <input class="form-control" id="inisialDokter" type="text" maxlength="30" size="56" ></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><small style="color:grey;">Spesialisasi/Sub-spesialisasi</small>
+                        <select id="spId" class="form-select"></select>
+                        <i><span style="color: red; font-size: 10pt;" id="spValidation"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><small style="color:grey;">Tindakan Medis</small>
+                        <select id="tindakanId" class="form-select"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <button class="btn btn-outline-primary" onclick="showPage()" style="width: 130px;">Atur Ulang</button>    
+                    </td>
+                    <td align="left">
+                        <button class="btn btn-primary" value="" onclick="cariDokter()" style="width: 130px;">Cari</button>    
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Relasi -->
+  <div class="modal fade" id="addrelation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table">
+                <tr>
+                    <td colspan="2"><small style="color:grey;">Nama</small>
+                      <span style="color: red; font-size: 10pt;" id="">*)</span>
+                      <input class="form-control" id="namaRelasi" type="text" maxlength="30" size="40" ></td>
+                      <a style="color: red; font-size: 10pt;" id="validation"></a>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <button class="btn btn-danger" data-bs-dismiss="modal" style="width: 130px;">Batal</button>    
+                    </td>
+                    <td align="left">
+                        <button class="btn btn-primary" value="" onclick="validateAdd()" style="width: 130px;">Simpan</button>    
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Relasi -->
+  <div class="modal fade" id="editrelation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <!-- <table class="table">
+                <tr>
+                    <td colspan="2"><small style="color:grey;">Nama</small>
+                      <span style="color: red; font-size: 10pt;" id="spValidation">*)</span>
+                      <input class="form-control" id="namaRelasi" type="text" maxlength="30" size="40" ></td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <button class="btn btn-danger" data-bs-dismiss="modal" style="width: 130px;">Batal</button>    
+                    </td>
+                    <td align="left">
+                        <button class="btn btn-primary" value="" onclick="editRelation()" style="width: 130px;">Simpan</button>    
+                    </td>
+                </tr>
+            </table> -->
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Hapus Relasi -->
+  <div class="modal fade" id="deleterelation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <!-- <table class="table">
+                <tr>
+                    <td colspan="2" style="color:grey;">Anda akan menghapus</td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <button class="btn btn-danger" data-bs-dismiss="modal" style="width: 130px;">Tidak</button>    
+                    </td>
+                    <td align="left">
+                        <button class="btn btn-primary" value="" onclick="deleteRelation()" style="width: 130px;">Ya</button>    
+                    </td>
+                </tr>
+            </table> -->
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgb(219, 244, 251);">
+    <div class="container-fluid">
+      <img src="/images/plus.png" style="padding-left: 50px;">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <a class="navbar-brand" href="" style="color: rgb(44, 156, 219); font-size: 30px;  padding-bottom: 10px; padding-right: 10px;">Med.Id</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+          <form class="d-flex">
+            <input class="form-control form-control-sm" type="text" placeholder="Cari Dokter atau Fasilitas Kesehatan" aria-label="Search" size="100" style="margin:5px;">
+            <span>
+              <button type="button" onclick="searchText()" class="btn btn-outline-secondary border-start-0 border-bottom-0 border ms-n5" style="background-color: rgb(44, 156, 219); margin:5px;">
+                <i class="fa fa-search" style="color: white;"></i>
+              </button>
+            </span>
+
+            <button class="btn btn-primary btn-sm" type="button" id="showName" onclick="userProfile()" style="width: 250px; margin: 10px; color: white; background-color: rgb(44, 156, 219); float: right;"></button>
+            
+          </form>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+<!-- <div class="body" style="height:400px">
+    <div class="sidebar" style="width: 170px; background: rgb(135, 219, 247); 
+  background: linear-gradient(180deg, rgba(219, 244, 251)0%, rgba(135, 219, 247)  100%); float: left; height: 99%;">
+
+  <a href="#" class="d-flex align-items-right mb-1 link-dark text-decoration-none" style="display: flex; justify-content: space-around; color:rgb(44, 156, 219);">
+    <svg class="" width="30" height="24"><use xlink:href=""/></svg>
+    <span class=""><b>...</b></span>
+  </a>
+  <ul class="nav nav-pills flex-column mb-auto"  id="showMenu">
+  </ul>
+    </div>
+    <div id="content">
+      <span class="align-middle">
+        <section layout:fragment="content" style="padding:3rem;" id="baseContent"></section>
+      </span>
+    </div>
+</div> -->
+
+<!-- Sidebar -->
+<div id="wrapper" style="height:400px">
+  <div id="sidebar-wrapper">
+    <br>
+    <ul class="sidebar-nav" id="showMenu">
+    </ul>
+  </div>
+  <div id="page-content-wrapper">
+    <div id="container-fluid">
+          <a href="#" class="btn" id="menu-toggle" style="float: left;"><i class="fa fa-bars"></i></a>
+          <div id="content" style="max-height: 400px; overflow-y: scroll;">
+            <span class="align-middle">
+              <section layout:fragment="content" style="padding:2rem;" id="baseContent"></section>
+            </span>
+          </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Footer -->
+<footer class="footer mt-auto py-3" style="position: absolute; bottom: 0; width: 100%; height: 140px; background-color:rgb(135, 219, 247); display: flex; flex-direction: column;">
+  <div class="container text-muted">
+    <div class="row" style="padding-left: 100px; font-size: small;">
+      <div class="col">
+        <a><small><b>Contact Information</b></small></a><br>
+        <a><small>Satrio Tower Building, 25th Floor, Jl. Prof Dr. Satrio Kav C4</small></a><br>
+        <a><small>Jakarta Selatan 12950, Indonesia</small></a><br>
+        <a><small>Email: contact@xsis.academy</small></a><br>
+        <a><small>Phone +62 21 2788 3570</small></a><br>
+        <a><small>Fax. +62 21 2788 3573</small></a>
+      </div>
+      <div class="col">
+          <a><small><b>Team Java Batch 313B</b></small></a><br>
+          <a><small>Dio Riksa Anugrah</small></a><br>
+          <a><small>Fariduddin Jiddan</small></a><br>
+          <a><small>Firsta Rifa</small></a><br>
+          <a><small>Hasnadhia Raufani</small></a><br>
+          <a><small>Nur Ikhsan Imanudin</small></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+
+      function searchText() {
+        $.ajax({
+          url:'http://localhost:8086/search/index',
+          type:'GET',
+          contentType:'application/json',
+          success:function(result) {
+            window.open('http://localhost:8086/search/index', '_self')
+            console.log(result)
+          }
+        })
+      }
+
+      function userProfile() {
+        $.ajax({
+          url:'http://localhost:8082/user/index',
+          type:'GET',
+          contentType:'application/json',
+          success:function(result) {
+            window.open('http://localhost:8082/user/index', '_self')
+            console.log(result)
+          }
+        })
+      }
+
+      function getLastValue() {
+            url = window.location.href
+            var strarr = url.split('/')
+            return strarr[strarr.length-1]
+        }
+        console.log(getLastValue())
+
+      loadName()
+      function loadName() {
+        $.ajax({
+          url:'http://localhost:5000/user/' + getLastValue(),
+          type:'GET',
+          contentType:'application/json',
+          success:function(name) {
+            console.log(name)
+            var str = '';
+            for(i = 0; i < name.length; i++) {
+              str += `
+              <div class="" style="color:white; font-weight: 500;">
+              Halo, ${name[i].fullname}!
+              </div>
+              `;
+            }
+            console.log(str)
+            $('#showName').html(str)
+          }
+        })
+      }
+
+</script>
+
+</body>
+</html>
